@@ -476,7 +476,7 @@ const COURSE_BY_ID = Object.fromEntries(COURSES.map(c => [c.id, c]));
 const courseLabel = id => { const c = COURSE_BY_ID[id]; return c ? (c.code ? `${c.code} · ${c.name}` : c.name) : ''; };
 const floorLabel = name => { const f = FLOOR_INVIGILATORS.find(x => x[1] === name); return f ? [f[0], f[1]].filter(Boolean).join(' ') : name; };
 const STAFF = [...new Set([...INVIGILATORS, ...FLOOR_INVIGILATORS.map(x => x[1]), 'Sample Coordinator'])].sort((a, b) => a.localeCompare(b));
-const TABS = [['details','Session details'],['warnings','Warnings'],['absentees','Absentees'],['staff','Invigilators'],['comments','Comments'],['notice','Notice']];
+const TABS = [['details','Session details'],['staff','Invigilators'],['absentees','Absentees'],['notice','Notice'],['warnings','Warnings'],['comments','Comments']];
 const ROLES = { ADMIN: 'Administrator (owner)', FLOOR: 'Floor invigilator', INVIG: 'Invigilator' };
 
 let uid = 1;

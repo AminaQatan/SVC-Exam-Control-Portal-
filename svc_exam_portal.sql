@@ -1272,8 +1272,8 @@ ORDER  BY period DESC;
         AND    exam_id = :P0_EXAM_ID
 
    c) Section tabs on the Room Sheet
-      Add a Region Display Selector region, then these regions with
-      "Region Display Selector" set to Yes:
+      Add a Region Display Selector region, then these regions in this
+      order, each with "Region Display Selector" set to Yes:
         Session Details  form items (date, course, no. of present)
                          P2_COURSE_ID: Popup LOV (it has a search box):
                            SELECT NVL2(course_code, course_code || ' · ', '')
@@ -1283,9 +1283,6 @@ ORDER  BY period DESC;
                            FROM   svc_courses
                            WHERE  is_active = 'Y'
                            ORDER  BY sort_order
-        Warnings         Interactive Grid on SVC_INCIDENTS
-                         WHERE session_id = :P2_SESSION_ID
-        Absentees        Interactive Grid on SVC_ABSENTEES
         Invigilators     P2_INVIGILATOR1_ID, P2_INVIGILATOR2_ID: Select Lists
                            SELECT full_name d, staff_id r FROM svc_staff
                            WHERE  is_invigilator = 'Y' AND is_active = 'Y'
@@ -1296,8 +1293,11 @@ ORDER  BY period DESC;
                            WHERE  is_floor_invigilator = 'Y' AND is_active = 'Y'
                            ORDER  BY full_name
                          P2_COORDINATOR_ID: Select List on all active staff
-        Comments         Checkbox group from SVC_VIOLATION_TYPES + COMMENTS
+        Absentees        Interactive Grid on SVC_ABSENTEES
         Notice           Static content from SVC_EXAMS
+        Warnings         Interactive Grid on SVC_INCIDENTS
+                         WHERE session_id = :P2_SESSION_ID
+        Comments         Checkbox group from SVC_VIOLATION_TYPES + COMMENTS
       Escalate button (PL/SQL process):
         svc_exam_pkg.escalate(:P2_INCIDENT_ID);
 
