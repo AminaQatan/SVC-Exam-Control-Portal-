@@ -1,0 +1,64 @@
+rules_version = '2';
+
+// Firestore rules for the SVC Exam Portal staff chat (GitHub version).
+// Paste this whole file into Firebase console › Firestore Database › Rules › Publish.
+//
+// Who may use the chat is kept in ONE document, config/access, that you edit
+// in the Firebase console (Firestore Database › Data). Its fields:
+//   staff  : array of staff Google emails, in lower case (include the admins)
+//   admins : array of emails that may delete any message and clear the chat
+//   domain : optional text, e.g. "example.edu.om", lets every account on that domain in
+// Keep these emails in Firebase only, not in the public GitHub repository.
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function access() {
+      return get(/databases/$(database)/documents/config/access).data;
+    }
+    function email() {
+      return request.auth.token.email.lower();
+    }
+    function isStaff() {
+      return request.auth != null
+        && request.auth.token.email_verified == true
+        && (email() in access().get('staff', [])
+            || email().split('@')[1] == access().get('domain', '-'));
+    }
+    function isAdmin() {
+      return isStaff() && email() in access().get('admins', []);
+    }
+
+    match /config/access {
+      allow read: if isStaff();
+      allow write: if false;  // edit it in the Firebase console
+    }
+
+    match /messages/{id} {
+      allow read: if isStaff();
+      allow create: if isStaff()
+        && request.resource.data.keys().hasOnly(['uid', 'name', 'photo', 'text', 'at'])
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.text is string
+        && request.resource.data.text.size() > 0
+        && request.resource.data.text.size() <= 1000
+        && request.resource.data.name is string
+        && request.resource.data.name.size() <= 150
+        && request.resource.data.photo is string
+        && request.resource.data.photo.size() <= 500
+        && request.resource.data.at == request.time;
+      allow update: if false;
+      allow delete: if isStaff()
+        && (resource.data.uid == request.auth.uid || isAdmin());
+    }
+
+    match /presence/{uid} {
+      allow read: if isStaff();
+      allow create, update: if isStaff()
+        && uid == request.auth.uid
+        && request.resource.data.keys().hasOnly(['name', 'photo', 'where', 'lastSeen'])
+        && request.resource.data.lastSeen == request.time;
+      allow delete: if isStaff() && uid == request.auth.uid;
+    }
+  }
+}

@@ -1,0 +1,1801 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>SVC Exam Portal</title>
+<meta name="description" content="Exam invigilation portal for Salalah Vocational College. Developer: Ms. Amina Qatan.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500&family=IBM+Plex+Sans+Arabic:wght@400;500;600&family=Readex+Pro:wght@500;600;700&display=swap">
+<style id="appcss">
+/* Layout: Oracle APEX-style app shell. Brand top bar, room navigator on the left (a drawer on phones), working area with section tabs. */
+:root{
+  --bg:#EDF1F2;
+  --surface:#FFFFFF;
+  --surface-2:#F4F7F8;
+  --line:#D6DEE1;
+  --fg:#152025;
+  --muted:#55656C;
+  --ok:#1F7F49;
+  --amber:#9A600A;
+  --st-none:#B7C2C6;
+  --ok-soft:color-mix(in oklab, var(--ok) 13%, var(--surface));
+  --amber-soft:color-mix(in oklab, var(--amber) 14%, var(--surface));
+  /* accent tokens, rewritten by the colour picker */
+  --brand:#3E7C87; --brand-ink:#FFFFFF;
+  --brand-text-l:#2F646D; --brand-text-d:#93C6CF;
+  --brand-text:var(--brand-text-l);
+  --brand-soft:color-mix(in oklab, var(--brand) 11%, var(--surface));
+  --band:#19D3E0; --band-ink:#111A1D;
+  --w1:#F2A43A; --w1-ink:#111A1D;
+  --w2:#8AB4F0; --w2-ink:#111A1D;
+  --w3:#E53935; --w3-ink:#111A1D;
+  --w4:#E9B824; --w4-ink:#111A1D;
+  --notice:#16BFD1; --notice-ink:#111A1D;
+  --absent:#F4D514; --absent-ink:#111A1D;
+  --shadow:0 1px 2px rgb(14 30 36 / .05), 0 8px 24px rgb(14 30 36 / .06);
+  --f-display:"Readex Pro","IBM Plex Sans Arabic",system-ui,sans-serif;
+  --f-body:"IBM Plex Sans Arabic",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --f-data:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  --r:12px; --r-sm:8px; --top:56px;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]):not([data-mode="light"]){
+    --bg:#0C1114; --surface:#141B1F; --surface-2:#1A2328; --line:#28343A; --fg:#E2E9EC; --muted:#93A3AA;
+    --ok:#5BC487; --amber:#E5A84E; --st-none:#3D4B51;
+    --brand-text:var(--brand-text-d);
+    --brand-soft:color-mix(in oklab, var(--brand) 24%, var(--surface));
+    --shadow:0 1px 2px rgb(0 0 0 / .35);
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]:not([data-mode="light"]), :root[data-mode="dark"]{
+  --bg:#0C1114; --surface:#141B1F; --surface-2:#1A2328; --line:#28343A; --fg:#E2E9EC; --muted:#93A3AA;
+  --ok:#5BC487; --amber:#E5A84E; --st-none:#3D4B51;
+  --brand-text:var(--brand-text-d);
+  --brand-soft:color-mix(in oklab, var(--brand) 24%, var(--surface));
+  --shadow:0 1px 2px rgb(0 0 0 / .35);
+  color-scheme:dark;
+}
+
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+img{max-width:100%}
+body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.5 var(--f-body);-webkit-font-smoothing:antialiased}
+h1,h2,h3{font-family:var(--f-display);line-height:1.2;margin:0;text-wrap:balance;letter-spacing:-.01em}
+p{margin:0}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+button:disabled{cursor:default;opacity:.55}
+:focus-visible{outline:2px solid var(--brand-text);outline-offset:2px}
+.num{font-family:var(--f-data);font-variant-numeric:tabular-nums}
+.muted{color:var(--muted)}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.ic{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:none}
+
+/* top bar */
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:60;background:var(--brand)}
+.topbar{position:sticky;top:env(safe-area-inset-top,0px);z-index:40;height:var(--top);display:flex;align-items:center;gap:10px;background:var(--brand);color:var(--brand-ink);padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.iconbtn{display:inline-grid;place-items:center;width:40px;height:40px;border:0;border-radius:var(--r-sm);background:transparent;color:inherit;flex:none}
+.iconbtn:hover{background:color-mix(in oklab, currentColor 14%, transparent)}
+.iconbtn .ic{width:22px;height:22px}
+/* college logo in a circular frame; the white ground is the logo's own, kept in both themes */
+.logo{display:grid;place-items:center;width:44px;height:44px;border-radius:50%;background:#FFFFFF;box-shadow:0 0 0 2px color-mix(in oklab, var(--brand-ink) 45%, transparent), 0 2px 6px rgb(0 0 0 / .18);overflow:hidden;flex:none}
+.logo img{width:80%;height:80%;object-fit:contain;display:block}
+.appname{min-width:0;display:flex;flex-direction:column}
+.appname b{font:600 16px/1.2 var(--f-display);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.appname span{font-size:12px;opacity:.88;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.spacer{flex:1}
+.topbtn{display:inline-flex;align-items:center;gap:8px;height:38px;padding:0 14px;border-radius:999px;border:1px solid color-mix(in oklab, currentColor 38%, transparent);background:color-mix(in oklab, currentColor 10%, transparent);color:inherit;font-weight:500;flex:none}
+.topbtn:hover{background:color-mix(in oklab, currentColor 18%, transparent)}
+.topbtn[aria-current="page"]{background:var(--brand-ink);color:var(--brand);border-color:transparent}
+@media (max-width:600px){.appname span{display:none}.topbtn .lbl{display:none}.topbtn{padding:0;width:40px;justify-content:center}}
+@media (max-width:380px){.logo{width:40px;height:40px}.topbar{gap:8px}}
+@media (min-width:960px){#menuBtn{display:none}}
+
+/* shell */
+.shell{display:grid;grid-template-columns:minmax(0,1fr)}
+@media (min-width:960px){.shell{grid-template-columns:252px minmax(0,1fr)}}
+.sidenav{background:var(--surface);border-right:1px solid var(--line);display:flex;flex-direction:column;gap:6px;padding:14px 10px 24px}
+@media (min-width:960px){.sidenav{position:sticky;top:calc(var(--top) + env(safe-area-inset-top,0px));height:calc(100vh - var(--top) - env(safe-area-inset-top,0px));overflow-y:auto}}
+@media (max-width:959.98px){
+  .sidenav{position:fixed;z-index:70;top:0;bottom:0;left:0;width:min(300px,86vw);overflow-y:auto;transform:translateX(-104%);transition:transform .22s ease;box-shadow:var(--shadow);padding-top:calc(14px + env(safe-area-inset-top,0px));padding-left:calc(10px + env(safe-area-inset-left,0px));padding-bottom:calc(24px + env(safe-area-inset-bottom,0px))}
+  body.nav-open .sidenav{transform:none}
+}
+.scrim{position:fixed;inset:0;z-index:65;background:rgb(6 12 14 / .45)}
+.whoami{display:flex;flex-direction:column;gap:6px;padding:10px;margin:0 2px 4px;border:1px solid var(--line);border-radius:var(--r-sm);background:var(--surface-2)}
+.whoami label{font-size:11px;font-weight:600;letter-spacing:.09em;text-transform:uppercase;color:var(--muted)}
+.whoami select{height:38px;background:var(--surface)}
+.whoami p{font-size:11.5px;color:var(--muted);line-height:1.4}
+.nav-top{padding:4px 4px}
+.nav-group{display:flex;flex-direction:column;gap:2px;margin-top:8px}
+.nav-group h2{font:600 11px/1 var(--f-body);text-transform:uppercase;letter-spacing:.09em;color:var(--muted);padding:8px 10px 6px}
+.nav-item{display:flex;align-items:center;gap:10px;width:100%;min-height:38px;padding:6px 10px;border:0;border-radius:var(--r-sm);background:transparent;text-align:left;color:var(--fg)}
+.nav-item:hover{background:var(--surface-2)}
+.nav-item[aria-current="page"]{background:var(--brand-soft);color:var(--brand-text);font-weight:600}
+.tag{margin-left:auto;font:600 10px/1 var(--f-body);letter-spacing:.06em;text-transform:uppercase;padding:4px 6px;border-radius:999px;border:1px solid currentColor;opacity:.8}
+.dot{width:9px;height:9px;border-radius:50%;background:transparent;border:1.5px solid var(--muted);flex:none;display:inline-block}
+.dot.progress{background:var(--amber);border-color:var(--amber)}
+.dot.complete{background:var(--ok);border-color:var(--ok)}
+.nav-item .count{margin-left:auto;font:500 11px/1 var(--f-data);padding:4px 7px;border-radius:999px;background:var(--w3);color:var(--w3-ink)}
+.legend{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:12px;color:var(--muted);padding:14px 10px 0;margin-top:auto;border-top:1px solid var(--line)}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+
+/* main */
+main{min-width:0;padding-block:20px 28px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+@media (min-width:960px){main{padding-block:28px 40px;padding-left:32px;padding-right:max(32px,env(safe-area-inset-right,0px))}}
+.wrap{max-width:1140px;margin:0 auto;display:flex;flex-direction:column;gap:18px}
+.crumbs{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:13px;color:var(--muted)}
+.crumbs button{border:0;background:none;padding:0;color:var(--brand-text);font-weight:500}
+.band{border-radius:var(--r);background:var(--band);color:var(--band-ink);padding:14px 16px 16px;display:flex;flex-direction:column;gap:10px}
+.band b{font:700 13px/1.4 var(--f-display);letter-spacing:.12em;text-transform:uppercase}
+.band > span{font-size:13.5px}
+.bandgrid{display:grid;gap:10px 12px;grid-template-columns:minmax(0,1.1fr) minmax(0,.8fr) minmax(0,1.6fr) minmax(0,1.2fr) minmax(0,1fr)}
+@media (max-width:980px){.bandgrid{grid-template-columns:repeat(2,minmax(0,1fr))}.bf.wide{grid-column:1 / -1}}
+.bf{display:flex;flex-direction:column;gap:4px;min-width:0}
+.bf > label{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;opacity:.82}
+.band .input{height:auto;min-height:40px;background:var(--surface);color:var(--fg);border-color:transparent;font-weight:500}
+.ms{position:relative}
+.ms-btn{display:flex;align-items:center;justify-content:space-between;gap:8px;text-align:left;padding-block:8px;line-height:1.35;cursor:pointer}
+.ms-btn .ic{width:16px;height:16px;color:var(--muted)}
+.ms-pop{position:absolute;z-index:20;top:calc(100% + 6px);left:0;min-width:100%;width:max-content;max-width:min(320px,calc(100vw - 32px));background:var(--surface);color:var(--fg);border:1px solid var(--line);border-radius:var(--r-sm);box-shadow:var(--shadow);padding:6px;display:flex;flex-direction:column;gap:2px}
+.ms-opt{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:6px;cursor:pointer;font-weight:500;font-size:14px}
+.ms-opt:hover{background:var(--surface-2)}
+.ms-opt input{accent-color:var(--brand);width:16px;height:16px;margin:0}
+.pagehead{display:flex;flex-direction:column;gap:6px}
+.pagehead-row{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:14px 20px}
+.eyebrow{font-size:12px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--brand-text);display:inline-flex;align-items:center;gap:6px}
+.pagehead h1{font-size:clamp(26px,4vw,34px);font-weight:600}
+.lead{color:var(--muted);font-size:14.5px;max-width:65ch}
+.roomhead{display:flex;flex-wrap:wrap;align-items:center;gap:12px 14px}
+.roomhead h1{font-size:clamp(28px,4.4vw,36px);font-weight:600}
+.pill{display:inline-flex;align-items:center;gap:6px;height:26px;padding:0 10px;border-radius:999px;font-size:12.5px;font-weight:600;white-space:nowrap;background:var(--surface-2);color:var(--muted);border:1px solid var(--line)}
+.pill.progress{background:var(--amber-soft);color:var(--amber);border-color:transparent}
+.pill.complete{background:var(--ok-soft);color:var(--ok);border-color:transparent}
+.seg{display:inline-flex;padding:3px;border-radius:999px;background:var(--surface);border:1px solid var(--line)}
+.roomhead .seg{margin-left:auto}
+.seg button{border:0;background:none;height:34px;padding:0 16px;border-radius:999px;font-weight:500;color:var(--muted);white-space:nowrap}
+.seg button[aria-pressed="true"]{background:var(--brand);color:var(--brand-ink)}
+.seg.sm button{height:30px;padding:0 12px;font-size:13px}
+@media (max-width:560px){.roomhead .seg{margin-left:0;width:100%}.roomhead .seg button{flex:1}}
+
+/* stat tiles */
+.stats{display:grid;gap:12px;grid-template-columns:repeat(4,minmax(0,1fr))}
+.stats.six{grid-template-columns:repeat(3,minmax(0,1fr))}
+@media (max-width:760px){.stats,.stats.six{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:12px 14px;display:flex;flex-direction:column;gap:4px;min-width:0}
+.stat .k{font-size:11.5px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.stat .v{font:600 26px/1.15 var(--f-body)}
+.stat .sub{font-size:12px;color:var(--muted);display:flex;flex-wrap:wrap;gap:4px 10px}
+.lv{display:inline-flex;align-items:center;gap:4px;font-family:var(--f-data);font-size:11.5px}
+.lv i{width:9px;height:9px;border-radius:2px;background:var(--lv)}
+
+/* tabs */
+.tabs-wrap{overflow-x:auto;border-bottom:1px solid var(--line);scrollbar-width:thin}
+.tabs{display:flex;gap:2px;min-width:max-content}
+.tab{border:0;background:none;padding:10px 14px 9px;font-weight:500;color:var(--muted);border-bottom:2px solid transparent;display:inline-flex;gap:8px;align-items:center;white-space:nowrap}
+.tab:hover{color:var(--fg)}
+.tab[aria-selected="true"]{color:var(--brand-text);border-bottom-color:var(--brand);font-weight:600}
+.tab .n{font:500 11px/1 var(--f-data);background:var(--surface-2);border:1px solid var(--line);color:var(--muted);padding:3px 6px;border-radius:999px}
+
+/* panels and forms */
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:18px;display:flex;flex-direction:column;gap:16px;box-shadow:var(--shadow);min-width:0}
+@media (min-width:760px){.panel{padding:22px 24px}}
+.panel-h{display:flex;flex-direction:column;gap:4px}
+.panel-h h2{font-size:19px;font-weight:600}
+.form{display:grid;gap:14px 16px;grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr))}
+.field{display:flex;flex-direction:column;gap:6px;min-width:0}
+.field label{font-size:13px;font-weight:600}
+.field .hint{font-size:12px;color:var(--muted)}
+.input{height:42px;padding:0 12px;border:1px solid var(--line);border-radius:var(--r-sm);background:var(--surface-2);width:100%;min-width:0}
+textarea.input{height:auto;min-height:120px;padding:10px 12px;resize:vertical;line-height:1.5}
+.input:focus{outline:none;border-color:var(--brand);box-shadow:0 0 0 3px color-mix(in oklab, var(--brand) 25%, transparent)}
+.input[readonly]{color:var(--muted);background:transparent;border-style:dashed}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:42px;padding:0 16px;border-radius:var(--r-sm);border:1px solid transparent;background:var(--brand);color:var(--brand-ink);font-weight:600;white-space:nowrap}
+.btn:hover{filter:brightness(1.06)}
+.btn.ghost{background:var(--surface);border-color:var(--line);color:var(--fg)}
+.btn.ghost:hover{background:var(--surface-2);filter:none}
+.btn.sm{height:30px;padding:0 10px;font-size:12.5px;font-weight:500}
+.addrow{display:grid;gap:10px 12px;grid-template-columns:minmax(0,2fr) minmax(0,1.2fr) auto;align-items:end}
+.addrow.two{grid-template-columns:minmax(0,1fr) auto}
+@media (max-width:640px){.addrow,.addrow.two{grid-template-columns:minmax(0,1fr)}}
+.empty{color:var(--muted);font-size:13.5px}
+
+/* warning board */
+.board{display:grid;gap:12px;grid-template-columns:repeat(4,minmax(0,1fr))}
+@media (max-width:1180px){.board{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:600px){.board{grid-template-columns:minmax(0,1fr)}}
+.l1{--lv:var(--w1);--lv-ink:var(--w1-ink)}
+.l2{--lv:var(--w2);--lv-ink:var(--w2-ink)}
+.l3{--lv:var(--w3);--lv-ink:var(--w3-ink)}
+.l4{--lv:var(--w4);--lv-ink:var(--w4-ink)}
+.lane{border:1px solid var(--line);border-radius:var(--r);background:var(--surface-2);display:flex;flex-direction:column;min-width:0;overflow:hidden}
+.lane-h{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:9px 12px;background:var(--lv);color:var(--lv-ink);font:600 14px/1.2 var(--f-display)}
+.lane-h .num{font-size:12.5px}
+.lane-b{padding:10px;display:flex;flex-direction:column;gap:8px;min-height:76px}
+.lane-b .empty{padding:6px 2px}
+.inc{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-sm);padding:10px 11px;display:flex;flex-direction:column;gap:8px}
+.inc .name{font-weight:600;line-height:1.35;overflow-wrap:anywhere}
+.inc .row{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.chip{font-size:12px;padding:2px 9px;border-radius:999px;background:var(--surface-2);border:1px solid var(--line);color:var(--muted)}
+
+/* absentees */
+.strip{border-radius:var(--r-sm);background:var(--absent);color:var(--absent-ink);padding:10px 14px;font:600 15px/1.3 var(--f-display);display:flex;justify-content:space-between;gap:12px}
+.list{list-style:none;margin:0;padding:0;border:1px solid var(--line);border-radius:var(--r-sm);overflow:hidden}
+.list li{display:flex;align-items:center;gap:12px;padding:10px 12px;border-top:1px solid var(--line);background:var(--surface)}
+.list li:first-child{border-top:0}
+.list .idx{font:500 12px/1 var(--f-data);color:var(--muted);width:22px;flex:none}
+.list .nm{flex:1;min-width:0;overflow-wrap:anywhere;font-weight:500}
+
+/* comments */
+.flags{display:flex;flex-wrap:wrap;gap:8px}
+.flag{display:inline-flex;align-items:center;gap:8px;padding:8px 14px;border:1px solid var(--line);border-radius:999px;background:var(--surface-2);cursor:pointer;user-select:none}
+.flag:has(input:checked){background:var(--brand-soft);border-color:var(--brand);color:var(--brand-text);font-weight:600}
+.flag input{accent-color:var(--brand);width:16px;height:16px;margin:0}
+.flag .ar{font-size:12.5px;color:var(--muted);font-weight:400}
+
+/* notice */
+.notice{border-radius:var(--r);overflow:hidden;border:1px solid var(--line)}
+.notice .ar{background:var(--notice);color:var(--notice-ink);padding:18px 16px;font:600 clamp(18px,2.6vw,23px)/1.7 var(--f-body);text-align:center}
+.notice .en{background:var(--surface-2);padding:14px 16px;font-weight:600;text-align:center}
+
+/* tables */
+.sectionhead{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:4px 16px}
+.sectionhead h2{font-size:19px;font-weight:600}
+.tablewrap{overflow-x:auto;border:1px solid var(--line);border-radius:var(--r);background:var(--surface)}
+table{border-collapse:collapse;width:100%;min-width:700px;font-size:14px}
+th{font-size:11.5px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);text-align:left;padding:10px 14px;background:var(--surface-2);border-bottom:1px solid var(--line);white-space:nowrap;font-weight:600}
+td{padding:10px 14px;border-bottom:1px solid var(--line);vertical-align:middle}
+tbody tr:last-child td{border-bottom:0}
+tbody tr:hover{background:var(--surface-2)}
+th.r,td.r{text-align:right}
+td.num{font-size:13.5px}
+.linkbtn{border:0;background:none;padding:0;font-weight:600;color:var(--brand-text);text-align:left}
+.linkbtn:hover{text-decoration:underline}
+.type{font-size:12px;color:var(--muted)}
+
+/* end-of-day report */
+.adminbadge{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;padding:4px 10px;border-radius:999px;background:var(--brand-soft);color:var(--brand-text)}
+.dlbar{display:flex;flex-wrap:wrap;gap:8px}
+.filters{display:flex;flex-wrap:wrap;gap:12px 18px;align-items:flex-end}
+.filter{display:flex;flex-direction:column;gap:6px}
+.filter > span{font-size:11.5px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.examplenote{background:color-mix(in oklab, var(--absent) 20%, var(--surface));border:1px solid color-mix(in oklab, var(--absent) 60%, var(--line));border-radius:var(--r-sm);padding:10px 14px;font-size:13.5px;max-width:none}
+.charts{display:grid;gap:14px;grid-template-columns:repeat(2,minmax(0,1fr))}
+@media (max-width:900px){.charts{grid-template-columns:minmax(0,1fr)}}
+.chart{margin:0;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px 18px 18px;display:flex;flex-direction:column;gap:14px;min-width:0}
+.chart.wide{grid-column:1 / -1}
+.chart figcaption{display:flex;flex-direction:column;gap:2px}
+.chart figcaption h3{font-size:15.5px;font-weight:600}
+.chart figcaption p{font-size:12.5px;color:var(--muted)}
+.keyrow{display:flex;flex-wrap:wrap;gap:6px 18px;font-size:12.5px;color:var(--muted)}
+.keyrow span{display:inline-flex;align-items:center;gap:6px}
+.keyrow b{font-weight:600;color:var(--fg);font-family:var(--f-data);font-size:12px}
+.sw-k{display:inline-block;width:10px;height:10px;border-radius:2px;background:var(--c);flex:none}
+.thinbar{display:flex;gap:2px;height:10px}
+.thinbar span{border-radius:999px;background:var(--c);min-width:6px}
+.mk{outline-offset:2px}
+.mk:hover,.mk:focus-visible{filter:brightness(1.1) saturate(1.05)}
+.colplot{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));height:190px;border-bottom:1px solid var(--line)}
+.colslot{display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:6px;height:100%;padding-top:4px}
+.colval{font:500 13px/1 var(--f-data);color:var(--fg)}
+.colbar{width:24px;border-radius:4px 4px 0 0;background:var(--lv);min-height:0}
+.collabels{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px;text-align:center;font-size:12px;color:var(--muted);margin-top:-6px}
+.hbars{display:grid;grid-template-columns:max-content minmax(0,1fr) max-content;gap:9px 10px;align-items:center;font-size:13px}
+.hrow{display:contents}
+.hl{white-space:nowrap}
+.htrack{display:flex;gap:2px;height:14px}
+.hseg{height:100%;background:var(--c)}
+.hseg:last-child{border-radius:0 4px 4px 0}
+.hv{font:500 12.5px/1 var(--f-data);color:var(--fg);text-align:right}
+.chart .empty{padding:18px 0}
+table.mini{min-width:0;font-size:13.5px}
+table.mini td,table.mini th{padding:8px 4px}
+table.mini tbody tr:hover{background:transparent}
+.tip{position:fixed;z-index:90;pointer-events:none;background:var(--surface);color:var(--fg);border:1px solid var(--line);box-shadow:var(--shadow);border-radius:8px;padding:8px 11px;max-width:260px;display:flex;flex-direction:column;gap:2px}
+.tip strong{font:600 15px/1.2 var(--f-data)}
+.tip span{font-size:12.5px;color:var(--muted)}
+
+/* theme drawer */
+.drawer{position:fixed;z-index:70;top:0;right:0;bottom:0;width:min(390px,92vw);background:var(--surface);border-left:1px solid var(--line);box-shadow:var(--shadow);overflow-y:auto;padding-top:calc(14px + env(safe-area-inset-top,0px));padding-bottom:calc(24px + env(safe-area-inset-bottom,0px));padding-left:20px;padding-right:max(20px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:22px}
+.dh{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.dh h2{font-size:20px;font-weight:600}
+.ds{display:flex;flex-direction:column;gap:10px}
+.ds h3{font:600 11.5px/1 var(--f-body);text-transform:uppercase;letter-spacing:.09em;color:var(--muted)}
+.presets{display:grid;gap:8px}
+.preset{display:flex;align-items:center;gap:12px;padding:10px 12px;border:1px solid var(--line);border-radius:var(--r-sm);background:var(--surface-2);text-align:left;color:var(--fg)}
+.preset[aria-pressed="true"]{border-color:var(--brand);box-shadow:0 0 0 2px color-mix(in oklab, var(--brand) 32%, transparent)}
+.sw{display:flex;flex:none;padding-left:4px}
+.sw i{width:18px;height:18px;border-radius:50%;margin-left:-5px;border:2px solid var(--surface)}
+.preset .pn{display:block;font-weight:600}
+.preset small{display:block;color:var(--muted);font-size:12px}
+.seg.full{display:flex}
+.seg.full button{flex:1}
+.colors{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.colorfield{display:flex;align-items:center;gap:10px;padding:8px;border:1px solid var(--line);border-radius:var(--r-sm);min-width:0;cursor:pointer}
+.colorfield input{width:34px;height:30px;border:0;padding:0;background:none;flex:none;cursor:pointer}
+.colorfield span{font-size:13px;min-width:0;line-height:1.3}
+.colorfield code{display:block;font:500 11px var(--f-data);color:var(--muted)}
+.dnote{font-size:12.5px;color:var(--muted);border-top:1px solid var(--line);padding-top:14px}
+.dnote code{font:500 12px var(--f-data);color:var(--brand-text)}
+
+/* toast + footer */
+.toast{position:fixed;z-index:80;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--fg);color:var(--bg);padding:10px 18px;border-radius:999px;font-weight:500;font-size:14px;box-shadow:var(--shadow);max-width:calc(100vw - 32px);text-align:center}
+.foot{display:flex;flex-wrap:wrap;gap:6px 18px;justify-content:space-between;font-size:12.5px;color:var(--muted);border-top:1px solid var(--line);padding-top:14px;margin-top:10px}
+.foot b{font-weight:600;color:var(--fg)}
+/* staff chat */
+.topbtn{position:relative}
+.badge{position:absolute;top:-3px;right:-3px;min-width:18px;height:18px;padding:0 5px;border-radius:999px;background:var(--w3);color:var(--w3-ink);font:600 11px/18px var(--f-data);text-align:center;box-shadow:0 0 0 2px var(--brand)}
+.wholine{font-size:13.5px;font-weight:600;color:var(--fg)}
+.chatpanel{gap:12px;overflow:hidden}
+.online{display:flex;flex-direction:column;gap:8px;border:1px solid var(--line);border-radius:var(--r-sm);padding:10px 12px;background:var(--surface-2)}
+.online h3{font:600 11.5px/1 var(--f-body);text-transform:uppercase;letter-spacing:.09em;color:var(--muted)}
+.online ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:7px;max-height:126px;overflow-y:auto}
+.online li{display:flex;align-items:center;gap:8px;font-size:13.5px;min-width:0}
+.online li img{width:24px;height:24px;border-radius:50%;flex:none;box-shadow:0 0 0 2px var(--surface-2),0 0 0 3.5px var(--ok)}
+.online .nm{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:500}
+.online .where{margin-left:auto;color:var(--muted);font-size:12px;white-space:nowrap;padding-left:8px}
+.msgs{flex:1;min-height:120px;overflow-y:auto;display:flex;flex-direction:column;gap:10px;padding:4px 2px}
+.daysep{align-self:center;font-size:11.5px;font-weight:600;color:var(--muted);background:var(--surface-2);border:1px solid var(--line);border-radius:999px;padding:2px 10px;margin:4px 0}
+.msg{display:flex;gap:8px;align-items:flex-end;min-width:0}
+.msg > img{width:28px;height:28px;border-radius:50%;flex:none}
+.msg.me{flex-direction:row-reverse}
+.bubble{min-width:0;max-width:82%;background:var(--surface-2);border:1px solid var(--line);border-radius:14px 14px 14px 4px;padding:7px 11px 8px;display:flex;flex-direction:column;gap:3px}
+.msg.me .bubble{background:var(--brand);color:var(--brand-ink);border-color:transparent;border-radius:14px 14px 4px 14px}
+.bubble .who{display:flex;flex-wrap:wrap;gap:2px 8px;align-items:baseline;font-size:12px;font-weight:600}
+.bubble .who time{font-weight:400;opacity:.78;font-size:11.5px;font-family:var(--f-data)}
+.bubble .txt{white-space:pre-wrap;overflow-wrap:anywhere;font-size:14px;line-height:1.45}
+.msgdel{align-self:flex-start;border:0;background:none;color:inherit;opacity:.8;font-size:11.5px;text-decoration:underline;padding:0}
+.chatnote{font-size:13px;color:var(--muted);border:1px dashed var(--line);border-radius:var(--r-sm);padding:9px 11px}
+.composer{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:end}
+.composer textarea.input{min-height:44px;max-height:132px;resize:none;padding:10px 12px}
+.chatfoot{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between;font-size:12px;color:var(--muted)}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <button class="iconbtn" id="menuBtn" type="button" aria-label="Open the room list" aria-controls="sidenav" aria-expanded="false">
+    <svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+  </button>
+  <span class="logo"><img src="data:image/webp;base64,UklGRv4PAABXRUJQVlA4IPIPAAAQPwCdASqgAKAAPj0ai0MiIaEWGr28IAPEsgBq2FXDJ9z/nPod1l+4/1X9O/2f3AdtnV3l88w/9X++flN8B/1V9y/51/33uAfqD+xPWQ8wv7NfuX7uX/M9Wf919Rv+9/3vrQfQe/aX05f3Q+Gz+1/8v9uvaP/+l7BflOmt9Qe1XMliZfHfup+g/MXzlPCHgEfjH83/wf5lcKSAP6nf7j7e+ePxAODDoC/pD1Xv7L/5+Yb6n/83uF/rj/0fXZ9mfpMIfdFWVQWkNGHiMjw4Xq4Vsbrx0BfNeVTXM72UDW+ePmbkNzKZ3pVJhCvZUFmFGRzeOf6M2zib+KbLaegBqCyGYvQfIsduS30mopiG/iVMTsmB9T+cwaWOs+RtfPy789dgpti/UKQc5yxYlBcH7TfZtYViqW2cftsfsaA3BrrV6+0Ju7clis/C2E3gzCDZ402tewgIu2uNI+2pAi0exORy2mzR7Krwq0spH88ksJzPIKwl9b/sWkHXNR16A21ZfsdP4AGI9tQi21iFNPMTVdNfBc8FGveMQlSauVENJbvB1xilEKbfskem5iA63mvWONzX4vbzLFbbmHLQFcMONk8JSfzhBDry5feQSABMaB0ZE/EAJY6FLA/4539+lr+pUCU72Xi++gM+8zHr9peHiFzDrnPovzzJ2SrUpXceyX5gEAAA/v6JGE5tQxg5iX+paAiriU2gJUZQQ2TJ3AP7Wi/9I+LGTGfoCBA1/XrUAI7wzOyQTg+9+y7CVygwCMz2jixKE1AANqKGBIikUa+8TwH+QH3gGPvjY5njcoNN7LC91JkFgAkAywEY2fHehGOxNb1xLziZ7TYKzY/K5ZfIKh6XBadTzgIXMnQ545bFLYTLpxSAAsAU3Zl/+8hSATyrZWovbrefz3Ocp7ETW0BZI0dyeBAjf1fb2xHdo6YbzdQtkc4DOVwf73rMCj/eMhM7Su9xhb4uSqMrz4t0o0oc/v3MsKr2Nx9NPf5WRLASaXLnclnFyyN0J+GAo6PeV/k8ZUBa7y+/wc0dBQONO+1t3r/phV0qXU1IDk5WmIQhmKIOIrd2ZmkU+Ykl5ONezfJthWQiXRf5/BmIeq+teBmPEXeASy2RS9KCQhUH4WA+6f77O6vDpUMDGlF1a9QnHPqmuRhiPf5e/01n0jBhWhAX41HYpST6F+I3mcenlgVFzGGPWW6xAlSF65JxuSRyE/O5L2bjTCbfQFGaWkBX7ujCFFwg16vuVFLR0qBpN9259UN6//6c6FuDR0MJF8S0tM+KgM7yFXsI0Nwmi1jigq+eeYzSZ8ce8QH8v6uM4TIG5qkeqMxJh7eu+eYt5W1fwwJZSFNIjfv/QzLSe+YzLDluKxSiFio6vpNlY0RDpy9SYUhPRfI58HVL82SUAmHJMRXs40Khiqu7T6i1/TEPHuUfB9PlCyZoL75QIZSqLIK0EgP8FbcNFtV7BRblXGMMysjfll+YvqqY4NiDcynmiW9gv8ozAtHYHQiRxepSfmDoH6AtFNckHowdrOTMPJxUTzf8zjamaqyKJ8HyTZ7ex4kdrq+T1CWBjj3R5Uzu13XtFZHX9s8VUqjbuukOpIFXYPR62Cuu5Z6vw/q7TYxTI8uGeVJhdIC6+K5wV1EZeOJ643i7d06edWlEC60gMvjSLYNaucfb+LC94pZTf9nliWZt1B6AiqoiOhdHbtidRwo/3PX+bb/y3Pg6CMEKKDgrVQsqwJ+n0g6CBWYWE0v8r/7IGcqVC5DCJ8965Ojn445fi6+BHaSfw2XZl1jU/RJSGg1q5k4lWMNZJBRHn9APJl+/7eOBCcdUm1Q5aKBn21COBbl/LG6eiW9OxCUWDElvL/FWAWvDIjFvPUp/k02QH7HaySTnmybkrwwkdV65bPP74khUSSF7dsqcWkgs3BXtDhUSEoq4pIqwoxwpRz/jiw3aVT6RCKuTWJqL8+P2Blu9BP4I/HXc38EV/dKW6NPfxWg4YASdL+KnA3jcKLvfyW9CVWNkGPZazUiy6inhDxDQvCprcselCgNzgzuCzBic99zuGny2YyBet68ixJHvJEbkv6QaREWm9vnK3H4bg0THHf9NSDsAo89TD/ff9/NkQjwoDN6glHhxxexE6YFjWOnw/cWHiSIlPeaNXGcIu+5aNM3bAcBUUb63zwy/L/2X3+7p9OUnwWe8W/0kmX/HxTMWoNcymfyeeMruT+XxZ86ifPPc+Nk6mh1uORcX3HL1sD0bdB9G7PjpbaFUhoMiuRvwpv2GVncXd7mVVDAO1HjGhGWh6nxpIUDHfn+iuXiZDjc+OKF8Xhdvrvqqrz0mkMqFqY2lkba2A6Ytmn+VAL4OPsHS9d8D+f6bxxyZ3dL3RQFE1HnZzsH89Q0OphoaT6fTqhGUL74tM9pGMz7YYEuDxlL6NCm/9KBsoqsPvdA+wWO605YCU5NQJoiruiml5l9hT6/Nu+oWRiDGi8V1G09t83fYcBClwie0ptmW970PA9SmJ4F/BHUiU6rAI78dQqYGqS58p8Gmf7YM8RTUrnx4zoQNK6JVEshOhoZS5EP/2L6vImkzYya7QSCqm0MWQZ8kz6L5Ke2GdSA23hLe7qVCEPOlvrWU/fSYtsKJMvlVmNGpE84J1qEUxjl5ayfDskOMdPLMNI25sL2UweQ5V7cA2ghLV4ern6IoyXoaAjCYXwal9HygblOHa6TdDhOkqIF0ajKEzXe6Zz6FNmOPs7hN1wV5S2To6Rji+gp311BsHUOpxx1Qt/Uvca277JvFGRVvNNzO8aqdvxutX6q3vmvkG+ly8Ye9MfVvMSKg8L1WCvwJjPCKmtJWTqK1V8A4pWm8eUDv1py01X/UCSzh4dl03SajsGgoedOV2QRCcdGYlaBuogqa3U0Cn0u3SVS/19DlW9mFBgaaZKOx6wj9u4Un5De/FTNvwNtxYZIHN9z/iBnUji9V+7Wj0y2js3/QBy5XZyTipgykdhuumQcAndN6RXi35AiQUXfO8+nAg6D/a1wzGMk+S086RVHrvmNX/wbzbru34tQ/TjfZYu7U8q48qDLiOddcxzsa7n1yGn+1seP0oDby6bwgr4aSAH+o5Ags/hfQMe4fE4Pn/pYFt3VlqoijZf8w5LQ2RCGUXmnCU4GUOFoJRple0aNwN0Spv6BLZNt0T4gB62NbEcdQm4cvW68tJU3M7TnSIS23vOwKWooVMvW73sk6tZwVYNS/+k8YR+kb1bDz0A6Ap95Fj9smKGHDEXQ3Q0atKsMThYcrs9O2V+K2RVSPwfQ0jXWV/Lb3t2vVQgygmASB1UZ9E/p2Y4GgcgDpcTXD/pbzkTYnde+M6LAKaiygWtx+eBOUvMKiJw3kxGQ9juinTetjCob8Gt9odwR9aoJh4rIFp8yV0M/+BNvEXmip023Dtd96n+cO7kpXwXtBSmFF0jufET/XCVv1nX0kp1r7qS+qFrFEf1vOAPFMVBRXVeGpF7dC0ZmfdKx9BTxbNoUyxhr0D5macLJYNkyL6dFedfk4fIKV8P+gc3IYq87sng4aak62exyW/T6Hl3w36L9svwHXDCDz0xW3GsUm42PtWI3GOie1CzuOvWQrhcd+6xaJrsp2Jkvyp/WIkkbF0qK/U94//xAMG6Yw9TR5gHi5hT+/axe2FJEEQdpp9iuHyz4dypKgKPzQjRqN9c3AzUKhGnp5eFBMmRLA0t28zOlJDnTpDKfQhPbtG/gFJymCX2d72IlAQCBl1r764ZwHWa0lPv243FLmpmBlCb46PCo9G8BEVuyJfm5fEF/bx3onDxow8D9r9OrNs1f/F/cV8H2ZVzcv+04gm2O9X4PojaSTeYkEvWttlOqYtVpETm2QHHHKiLLRD0eGfS9gST8CoXx6JMWoRg89ALJzbnhg84sIS1yuuX6XrK6fnBFkAjF8uZc1Rsi1p1i8YcXRWvNtLZrlZKt056mft5w+Pfig2lscuE2uiTTUPOVLJKFuHHb7AxIzz8jDbQmKVrfE1opqN1D/l+JfJBbGozEl0WdD7XeTT4NOHmxep7DX/hL4XULF2xrX01lss2zbSYHJtO88SxFcWkj+CyVm53fv4y2c4xVyc637Q95I5VW+licDmJ9WgZ6Flt8R/xeijUFrtBwAh4haGLWKi/ZotPoyQEum+we7wCP/z4yGH33Q/TvJYAvYDCkFeJqUEsSU2ug9LBt0UNWMDSYTqPmt2WpqrK/MbrkfkCXJJtZjTee0iHHthmVr4F3csmNHsMsXEzdMbj14OKUCLKsxU8m35AWqPWCfJTHeeV6KyIzZqxzWv99NQ/u7E/hFu6tlSTTsRwc4D/rW5W1Xx5CTMP8Gal0Ezt2xkVviuET60pW3dDl7m76n9PwO/PAgqiuBMS2bjvMrEjsebYGceolSeReBEWySJ7IJq0oBEtcuav+rJuAGmCu8YhmdeVrYDVV0J7hvfGS4gMyIUY8IMdBwzgo3A9lrOkXh9/wgFw8fVkdzoVIXY/1QDyFH5upW+aN1nuOS+hV+m1WZnFQJLl27/susqnt5sSR56Ehpt9r8xj2nCXRHMyPFq0wXrLjgcROmZy+0U5/urLCK+iJD6v5ztIy2ZJpissreBgJq2eca8QQ1j/qILSY71qakwWP7O4CVr5GSvhOARWCSvRKH3xj8Tx0tI562RtKL+F+X7O6oZ7tW6YczA9TInFsSCXCTZ2nB+zuWvxMGtYFCoMthoRmZKTy6iCC8XCKwUF1Y9yH0bBE16mOU0H9pnLjowUwKYWjj/NTvrHfkaanP/SQbI3yq3v+HuFHMi4Oomuq4T4MXrYJp5JWQ42qNM6oyKX7wD5NuEmsDliHGikjbizQ9MCEjnwmfpNh74drbgr1j8lcBxjoE8RgBIolnf24kEk/gACcK6R7WXuFL2NyPw7MlrYBYkVwredknnlD5jOCq67ZHjI3vneW9H0KsJ8P4+cMXI7l6Us+WHjQ9+zzhOV2hcW3rm6pO+6lXOu1CYlUkW8V2BNqBQf1GmlSaKoZ3hf4W+aPko+W9fumv0n9kpTj4byVuyE7c73UG+9Dv+swbffvJgPUACrRVV7BCCW8WzCPj5SbA0Egk5Tg96kKO8Krk9nCQvjqLXebxHOoJUuaXaoOGaHlB/KOaDb6pcYLr65flNViBbnqTtP8/2DnNT6zQI9LjpRDcMGYW2HmpKZpIdfnk98hZso+XGqJi6mjOZk/yxL4OnZzhj0UvvdWeNxC6DzPOWx7j4ufO5mtPdZJ6/TO1vivMxieR5ewROtZaEoiYsM6Hn9er8k6JOszLeNndATM251AHjIlN0RveKolsS7KPQN418d8Hw8XmSrKi4g1NXW15HuxfbSRDrxwAAEfaFIjw2PMCG7ouFjnMOr9lSwvGqYDs0dTF7sn85abyUeaamgioyKh7jxIq8a6aYuApsfi8Kk1OUREXZrsqun/BiOJmgWAc97iAAAAAAA==" alt="Salalah Vocational College logo" width="35" height="35"></span>
+  <div class="appname"><b>SVC Exam Portal</b><span id="examLine">Midterm Exam · November 2026 · Term 1</span></div>
+  <div class="spacer"></div>
+  <button class="topbtn" id="reportBtn" type="button" aria-label="End-of-day report">
+    <svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20h16"/><path d="M7 16v-5M12 16V7M17 16v-8"/><path d="M15 4h4v4"/></svg>
+    <span class="lbl">Day report</span>
+  </button>
+  <button class="topbtn" id="chatBtn" type="button" aria-controls="chatPanel" aria-expanded="false" aria-label="Staff chat" hidden>
+    <svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v11H9l-5 4z"/><path d="M8 9.5h8M8 12.5h5"/></svg>
+    <span class="lbl">Chat</span>
+    <span class="badge" id="chatBadge" hidden></span>
+  </button>
+  <button class="topbtn" id="themeBtn" type="button" aria-controls="themePanel" aria-expanded="false" aria-label="Colours">
+    <svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a9 9 0 1 0 0 18c1.2 0 1.8-.9 1.8-1.8 0-.5-.2-.9-.5-1.2-.3-.3-.5-.7-.5-1.2 0-1 .8-1.8 1.8-1.8H17a4 4 0 0 0 4-4C21 6.5 17 3 12 3z"/><circle cx="7.5" cy="11" r="1.2"/><circle cx="10.5" cy="7.2" r="1.2"/><circle cx="15" cy="7.6" r="1.2"/></svg>
+    <span class="lbl">Colours</span>
+  </button>
+</header>
+<div class="scrim" id="scrim" hidden></div>
+<div class="shell">
+  <nav class="sidenav" id="sidenav" aria-label="Rooms">
+    <div class="whoami">
+      <label for="roleSelect" id="roleLabel">Viewing as</label>
+      <span class="wholine" id="whoLine" hidden></span>
+      <select class="input" id="roleSelect">
+        <option value="ADMIN">Administrator (owner)</option>
+        <option value="FLOOR">Floor invigilator</option>
+        <option value="INVIG">Invigilator</option>
+      </select>
+      <p id="roleHint">Preview switch. In the Oracle app the role comes from each person’s login.</p>
+    </div>
+    <div class="nav-top">
+      <label class="sr" for="roomSearch">Find a room</label>
+      <input class="input" id="roomSearch" type="search" placeholder="Find a room" autocomplete="off">
+    </div>
+    <div id="navList"></div>
+    <div class="legend" aria-label="Status key">
+      <span><i class="dot"></i>Not started</span>
+      <span><i class="dot progress"></i>In progress</span>
+      <span><i class="dot complete"></i>Complete</span>
+    </div>
+  </nav>
+  <main id="main"><div class="wrap" id="view"></div></main>
+</div>
+<aside class="drawer" id="themePanel" aria-label="Colour themes" hidden></aside>
+<aside class="drawer chatpanel" id="chatPanel" aria-label="Staff chat" hidden>
+  <div class="dh"><h2>Staff chat</h2><button type="button" class="iconbtn" data-chat-close aria-label="Close chat"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+  <section class="online" id="onlineSec" aria-labelledby="onlineHead" hidden><h3 id="onlineHead">Online now</h3><ul id="onlineList"></ul></section>
+  <div class="msgs" id="chatMsgs" role="log" aria-label="Messages" tabindex="0"></div>
+  <p class="chatnote" id="chatNote" hidden></p>
+  <form class="composer" id="chatForm" autocomplete="off">
+    <label class="sr" for="chatInput">Message</label>
+    <textarea class="input" id="chatInput" rows="1" maxlength="1000" dir="auto" placeholder="Write a message"></textarea>
+    <button class="btn" type="submit">Send</button>
+  </form>
+  <div class="chatfoot" id="chatFoot"></div>
+</aside>
+<div class="tip" id="tip" role="tooltip" hidden></div>
+<div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+
+<script src="chat-config.js"></script>
+<script>
+(() => {
+'use strict';
+const $ = (s, el = document) => el.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const slug = s => s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+const clean = s => String(s || '').replace(/\s+/g, ' ').trim();
+const pad = n => String(n).padStart(2, '0');
+
+/* ---------- data from the exam sheet ---------- */
+const EXAM = {
+  name: 'Midterm Exam', levels: 'Preparatory – Post-Preparatory', month: 'November 2026', year: '2026-2027', term: 1,
+  noticeAr: 'يسمح للطالب بالذهاب إلى دورة المياه في أول 15 دقيقة من بدء الاختبار',
+  noticeEn: 'Students are allowed to go to washrooms during the first 15 minutes of the exam commencement.'
+};
+const EXAM_TYPES = [['MIDTERM', 'Midterm Exam'], ['FINAL', 'Final Exam']];
+const PROGRAMS = [['PREPARATORY', 'Preparatory'], ['POST_PREPARATORY', 'Post-Preparatory']];
+const YEARS = Array.from({ length: 10 }, (_, i) => `${2026 + i}-${2027 + i}`);
+const TERMS = [1, 2, 3];
+const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+function monthOptions(year) {
+  const y0 = +year.slice(0, 4);
+  return [9, 10, 11, 12, 1, 2, 3, 4, 5, 6, 7, 8].map(m => [m, `${MONTHS[m - 1]} ${m >= 9 ? y0 : y0 + 1}`]);
+}
+const ROOMS = [
+  ['Room 1','ROOM'],['Room 2','ROOM'],['Room 3','ROOM'],['Room 4','ROOM'],['Room 5','ROOM'],['Room 6','ROOM'],['Room 7','ROOM'],
+  ['Room 13','ROOM'],['Room 17','ROOM'],['Room 12','ROOM'],
+  ['Room 101','ROOM'],['Room 102','ROOM'],['Room 103','ROOM'],['Room 104','ROOM'],['Room 105','ROOM'],['Room 106','ROOM'],
+  ['Lab 1','LAB'],['Lab 2','LAB'],['Lab 3','LAB'],['Lab 4','LAB'],
+  ['Old Drawing Hall','HALL'],['New Drawing Hall','HALL'],
+  ['Chemistry Lab','LAB'],['Physics Lab','LAB']
+].map(([name, type], i) => ({ id: slug(name), name, type, order: i + 1 }));
+const GROUPS = [['ROOM','Classrooms'],['LAB','Labs'],['HALL','Drawing halls']];
+const TYPE_LABEL = { ROOM: 'Classroom', LAB: 'Lab', HALL: 'Drawing hall' };
+const PERIODS = [['MORNING','Morning'],['AFTERNOON','Afternoon']];
+const LEVELS = [
+  { n: 1, label: 'Warning 1', short: 'W1', cls: 'l1' },
+  { n: 2, label: 'Warning 2', short: 'W2', cls: 'l2' },
+  { n: 3, label: 'Warning 3', short: 'W3', cls: 'l3' },
+  { n: 4, label: 'Cheating report', short: 'CR', cls: 'l4' }
+];
+const VIOLATIONS = [
+  { code: 'COPYING', en: 'Copying', ar: 'نسخ' },
+  { code: 'SHARING', en: 'Sharing answers', ar: 'تبادل الإجابات' },
+  { code: 'MOBILE',  en: 'Mobile', ar: 'استخدام الهاتف' },
+  { code: 'TALKING', en: 'Talking', ar: 'التحدث' }
+];
+const COURSE_GROUPS = [["Foundation", [["", "English Level 1"], ["", "English Level 2"], ["", "English Level 3"], ["", "Computing Skills"], ["", "Math for Foundation"], ["", "Engineering Drawing 1"], ["", "Engineering Drawing 2"]]], ["Shared courses", [["CHEM1101", "Chemistry 1"], ["CHEM1202", "Chemistry 2"], ["MTCL1101", "Calculus"], ["MTEN1202", "Engineering Math"], ["MTST1101", "Statistics"], ["PHYS1101", "Physics 1"], ["PHYS1202", "Physics 2"], ["INTE1202", "Introduction to Programming (C++)"], ["TWENG1101", "Technical Writing"], ["TCENG1202", "Technical Communication"], ["PSENG1303", "Public Speaking"], ["ENTRP1101", "Entrepreneurship 1"], ["ENTRP1202", "Entrepreneurship 2"]]], ["Industrial Electricity", [["EELIE1101", "Health & Safety Precautions"], ["EELIE1102", "Basic Electricity (AC/DC) & Electrical Code"], ["EELIE1203", "Tools, Instruments, Electric Wires and Cables Work"], ["EELIE1204", "Basic Electronics"], ["EELIE1305", "Electrical Circuits & Protection Devices"], ["EELIE1306", "Three Phase Principles"], ["EELIE2107", "Industrial Transformers"], ["EELIE2108", "Industrial Motors and Controllers"], ["EELIE2209", "Industrial Switchboards"], ["EELIE2210", "Graduation Project 1"], ["EELIE2211", "Power Electronics"], ["EELIE2312", "PLC & Regulation Systems"], ["EELIE2313", "Electrical General Maintenance"], ["EELIE2314", "Graduation Project 2"]]], ["Electronic Instrument Maintenance", [["EECIM1101", "Basic Electricity and System"], ["EECIM1102", "Basic Electronics and Circuits"], ["EECIM1203", "Fundamental Digital Electronics and Circuits"], ["EECIM1204", "Installation, Service and Maintenance of Audio-Video Systems"], ["EECIM1305", "Switched Mode Power, Auto-volt and Uninterruptible Power Supply Systems"], ["EECIM1306", "Electronic Devices Servicing I"], ["EECIM2107", "Personal Computer & Multimedia Devices"], ["EECIM2108", "Computer System Data Communication and Internet"], ["EECIM2209", "Graduation Project 1"], ["EECIM2210", "Security and Alarm System"], ["EECIM2311", "Electronic Devices Servicing II"], ["EECIM2312", "Graduation Project 2"]]], ["Interior Design", [["ECBID1101", "Fundamentals of Design"], ["ECBID1102", "Architectural Drawing"], ["ECBID1203", "Drawing Skills 1"], ["ECBID1404", "Design Studio (1): Residential Design"], ["ECBID1305", "Drawing Skills 2"], ["ECBID1306", "Computer for Interior Design 1"], ["ECBID1307", "History of Design 1"], ["ECBID2108", "Design Studio (2): Commercial Design"], ["ECBID2109", "History of Design 2"], ["ECBID2110", "Computer for Interior Design 2"], ["ECBID2211", "Design Studio (3): Administrative Design"], ["ECBID2212", "Quantity Survey"], ["ECBID2213", "Project 1"], ["ECBID2214", "Entrepreneurship 1"], ["ECBID2314", "Architectural Models"], ["ECBID2315", "Project 2"], ["ITPH1202", "Introduction to Photoshop CS6"], ["MTID1101", "Math for Design"]]], ["Food Safety and Quality Control", [["GBIO1101", "General Biology"], ["BCHEM1101", "Biochemistry"], ["MSFQ1101", "Food Microbiology"], ["MSFQ1102", "Occupational Safety and First Aid"], ["MSFQ1202", "Oceanography"], ["MSFQ1203", "Marine Biology"], ["MSFQ1305", "Food Quality Control"], ["MSFQ1306", "Food Legislation"], ["MSFQ1307", "Food Safety"], ["MSFQ2108", "Advanced Seafood Safety"], ["MSFQ2109", "Seafood Processing Technology 1"], ["MSFQ2109", "Seafood Processing Technology 2"], ["MSFQ2110", "Scientific Instrument"], ["MSFQ2110", "Field Work 2"], ["MSFQ2111", "Graduation Project"], ["MSFQ2317", "Fishing Gears & Methods"], ["MSFQ2318", "Marine Navigation"], ["MSFQ2319", "Marine Engine"], ["MSFQ2320", "Field Work 3"], ["TCENG1201", "Technical Communication"], ["PSENG1301", "Public Speaking"]]], ["Selling & Marketing", [["BBSSM2302", "Sales Management"], ["BBSSM2204", "Graduation Project"], ["INBS1202", "E-Commerce"], ["", "Principles of Marketing"], ["", "Economics Issues"], ["", "Introduction to Business"], ["", "Statistics"], ["", "Marketing Communication"], ["", "Business Ethics"], ["", "Business Math"], ["", "Consumer Behavior"], ["", "Advertising & Promotion"], ["", "Introduction to Selling"], ["", "Principles of Management"], ["", "Service Marketing"], ["", "Retailing Management"], ["", "Professional Selling"], ["", "Retail Pricing Strategies"], ["", "Business Research"], ["", "Consumer's Relationship Management"], ["", "Entrepreneurship (General)"]]], ["Warehousing & Logistics Management", [["", "Introduction to Business"], ["", "Statistics"], ["", "Principles of Management"], ["", "Supply Chain Management"]]], ["Other courses", [["", "اللغة الإنجليزية أ"], ["", "تقنية المعلومات أ"], ["", "ريادة الأعمال"], ["", "علوم مهنة"]]]];
+const INVIGILATORS = ["Invigilator 01", "Invigilator 02", "Invigilator 03", "Invigilator 04", "Invigilator 05", "Invigilator 06", "Invigilator 07", "Invigilator 08", "Invigilator 09", "Invigilator 10", "Invigilator 11", "Invigilator 12", "Invigilator 13", "Invigilator 14", "Invigilator 15", "Invigilator 16", "Invigilator 17", "Invigilator 18", "Invigilator 19", "Invigilator 20", "Invigilator 21", "Invigilator 22", "Invigilator 23", "Invigilator 24", "Invigilator 25", "Invigilator 26", "Invigilator 27", "Invigilator 28", "Invigilator 29", "Invigilator 30", "Invigilator 31", "Invigilator 32", "Invigilator 33", "Invigilator 34", "Invigilator 35", "Invigilator 36", "Invigilator 37", "Invigilator 38", "Invigilator 39", "Invigilator 40", "Invigilator 41", "Invigilator 42", "Invigilator 43", "Invigilator 44", "Invigilator 45", "Invigilator 46", "Invigilator 47", "Invigilator 48", "Invigilator 49", "Invigilator 50", "Invigilator 51", "Invigilator 52", "Invigilator 53", "Invigilator 54", "Invigilator 55", "Invigilator 56", "Invigilator 57", "Invigilator 58", "Invigilator 59", "Invigilator 60", "Invigilator 61", "Invigilator 62", "Invigilator 63", "Invigilator 64"];
+const FLOOR_INVIGILATORS = [["", "Floor Invigilator 01"], ["", "Floor Invigilator 02"], ["", "Floor Invigilator 03"], ["", "Floor Invigilator 04"], ["", "Floor Invigilator 05"], ["", "Floor Invigilator 06"], ["", "Floor Invigilator 07"], ["", "Floor Invigilator 08"], ["", "Floor Invigilator 09"], ["", "Floor Invigilator 10"], ["", "Floor Invigilator 11"], ["", "Floor Invigilator 12"], ["", "Floor Invigilator 13"], ["", "Floor Invigilator 14"], ["", "Floor Invigilator 15"], ["", "Floor Invigilator 16"]];
+const COURSES = [];
+COURSE_GROUPS.forEach(([group, items]) => items.forEach(([code, name]) => COURSES.push({ id: 'c' + (COURSES.length + 1), code, name, group })));
+const COURSE_BY_ID = Object.fromEntries(COURSES.map(c => [c.id, c]));
+const courseLabel = id => { const c = COURSE_BY_ID[id]; return c ? (c.code ? `${c.code} · ${c.name}` : c.name) : ''; };
+const floorLabel = name => { const f = FLOOR_INVIGILATORS.find(x => x[1] === name); return f ? [f[0], f[1]].filter(Boolean).join(' ') : name; };
+const STAFF = [...new Set([...INVIGILATORS, ...FLOOR_INVIGILATORS.map(x => x[1]), 'Sample Coordinator'])].sort((a, b) => a.localeCompare(b));
+const TABS = [['details','Session details'],['warnings','Warnings'],['absentees','Absentees'],['staff','Invigilators'],['comments','Comments'],['notice','Notice']];
+const ROLES = { ADMIN: 'Administrator (owner)', FLOOR: 'Floor invigilator', INVIG: 'Invigilator' };
+
+let uid = 1;
+const blank = () => ({ date: '', course: '', present: '', incidents: [], absentees: [], inv1: '', inv2: '', floor: '', coord: '', flags: {}, comments: '' });
+/* each exam (type + academic year + term) has its own room sheets */
+const exams = {};
+const examKey = (t, y, term) => `${t}|${y}|${term}`;
+function getExam(t, y, term, base) {
+  const k = examKey(t, y, term);
+  if (!exams[k]) {
+    const sessions = {};
+    ROOMS.forEach(r => PERIODS.forEach(([p]) => { sessions[r.id + '|' + p] = blank(); }));
+    exams[k] = { type: t, year: y, term, programs: base ? [...base.programs] : ['PREPARATORY', 'POST_PREPARATORY'], monthNum: base ? base.monthNum : 11, sessions };
+  }
+  return exams[k];
+}
+let cur = getExam('MIDTERM', '2026-2027', 1);
+let S = cur.sessions;
+const r13 = S['room-13|MORNING'];
+['Sample Student 1', 'Sample Student 2', 'Sample Student 3']
+  .forEach(name => r13.incidents.push({ id: uid++, name, level: 1, violation: '' }));
+r13.absentees.push('Sample Student 4');
+Object.assign(r13, { inv1: 'Invigilator 01', floor: 'Floor Invigilator 01', coord: 'Sample Coordinator' });
+
+/* Example full day, used only by the report preview. Student numbers, not names. */
+function rng(seed) {
+  return () => { seed = seed + 0x6D2B79F5 | 0; let t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; };
+}
+const EXAMPLE = (() => {
+  const R = rng(20261101), X = {};
+  const pickCourse = groups => { const list = COURSES.filter(c => groups.includes(c.group)); return list[Math.floor(R() * list.length)].id; };
+  let sn = 4100;
+  ROOMS.forEach((r, ri) => PERIODS.forEach(([p], pi) => {
+    const s = blank();
+    if (R() > 0.07) {
+      s.course = r.name === 'Chemistry Lab' ? 'c' + (COURSES.findIndex(c => c.code === 'CHEM1101') + 1)
+        : r.name === 'Physics Lab' ? 'c' + (COURSES.findIndex(c => c.code === 'PHYS1101') + 1)
+        : r.type === 'HALL' ? pickCourse(['Interior Design'])
+        : r.type === 'LAB' ? pickCourse(['Electronic Instrument Maintenance', 'Industrial Electricity'])
+        : pickCourse(['Foundation', 'Shared courses', 'Selling & Marketing', 'Food Safety and Quality Control']);
+      s.present = String(13 + Math.floor(R() * 13));
+      s.inv1 = 'Invigilator ' + pad(ri * 2 + pi + 1);
+      if (R() < 0.45) s.inv2 = 'Invigilator ' + pad(49 + ri);
+      s.floor = 'Floor invigilator ' + (1 + Math.floor(ri / 6));
+      const nAbs = Math.floor(R() * R() * 4.2);
+      for (let i = 0; i < nAbs; i++) s.absentees.push('Student 26-' + (sn++));
+      const nInc = Math.floor(R() * R() * 4.4);
+      for (let i = 0; i < nInc; i++) {
+        const x = R();
+        s.incidents.push({ id: 9000 + sn, name: 'Student 26-' + (sn++), level: x < 0.6 ? 1 : x < 0.83 ? 2 : x < 0.94 ? 3 : 4,
+          violation: ['COPYING', 'SHARING', 'MOBILE', 'TALKING', 'TALKING', ''][Math.floor(R() * 6)] });
+      }
+      VIOLATIONS.forEach(v => { if (R() < 0.08) s.flags[v.code] = true; });
+      if (R() < 0.1) s.present = '';
+    }
+    X[r.id + '|' + p] = s;
+  }));
+  return X;
+})();
+
+const ui = { view: 'room', room: 'room-13', period: 'MORNING', tab: 'details', filter: '', identity: 'pending', pendingRoute: null,
+  role: (window.claude && typeof window.claude.use === 'function') ? 'INVIG' : 'ADMIN',
+  rep: { source: 'example', period: 'ALL', type: 'ALL' } };
+const isAdmin = () => ui.role === 'ADMIN';
+
+/* ---------- helpers ---------- */
+const sess = () => S[ui.room + '|' + ui.period];
+const presentNum = s => s.present === '' ? 0 : Math.max(0, parseInt(s.present, 10) || 0);
+function status(s) {
+  if (s.course && s.present !== '' && s.inv1) return 'complete';
+  if (s.course || s.present !== '' || s.incidents.length || s.absentees.length || s.inv1 || s.inv2 || s.floor || s.coord || s.comments) return 'progress';
+  return 'none';
+}
+function roomStatus(id) {
+  const a = status(S[id + '|MORNING']), b = status(S[id + '|AFTERNOON']);
+  if (a === 'complete' && b === 'complete') return 'complete';
+  if (a === 'none' && b === 'none') return 'none';
+  return 'progress';
+}
+const STATUS_LABEL = { none: 'Not started', progress: 'In progress', complete: 'Complete' };
+const both = (id, fn) => fn(S[id + '|MORNING']) + fn(S[id + '|AFTERNOON']);
+function weekday(d) {
+  if (!d) return '';
+  const dt = new Date(d + 'T12:00:00');
+  return isNaN(dt) ? '' : dt.toLocaleDateString('en-GB', { weekday: 'long' });
+}
+const field = (id, label, control, hint = '') =>
+  `<div class="field"><label for="${id}">${label}</label>${control}${hint ? `<span class="hint">${hint}</span>` : ''}</div>`;
+const vLabel = code => { const v = VIOLATIONS.find(x => x.code === code); return v ? `${v.en} · ${v.ar}` : ''; };
+function knownStudents() {
+  const set = new Set();
+  Object.values(S).forEach(s => { s.incidents.forEach(i => set.add(i.name)); s.absentees.forEach(n => set.add(n)); });
+  return [...set].sort();
+}
+let toastTimer;
+function toast(msg) {
+  const t = $('#toast');
+  t.textContent = msg; t.hidden = false;
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => { t.hidden = true; }, 2800);
+}
+const ICON = {
+  grid: '<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><rect x="13" y="13" width="7" height="7" rx="1.5"/></svg>',
+  chart: '<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20h16"/><path d="M7 16v-5M12 16V7M17 16v-8"/></svg>',
+  lock: '<svg class="ic" viewBox="0 0 24 24" aria-hidden="true" style="width:14px;height:14px"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>',
+  down: '<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg>',
+  close: '<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>',
+  chev: '<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>'
+};
+const today = new Date();
+const TODAY_ISO = `${today.getFullYear()}-${pad(today.getMonth() + 1)}-${pad(today.getDate())}`;
+const TODAY_LABEL = today.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+
+/* ---------- navigation ---------- */
+function renderNav() {
+  const f = ui.filter.trim().toLowerCase();
+  let h = `<div class="nav-group"><h2>Overview</h2>
+    <button type="button" class="nav-item" data-go="dashboard" ${ui.view === 'dashboard' ? 'aria-current="page"' : ''}>${ICON.grid}<span>Exam day overview</span></button>
+    ${isAdmin() ? `<button type="button" class="nav-item" data-go="day-report" ${ui.view === 'report' ? 'aria-current="page"' : ''}>${ICON.chart}<span>End-of-day report</span><span class="tag">Admin</span></button>` : ''}
+  </div>`;
+  let shown = 0;
+  for (const [type, label] of GROUPS) {
+    const rooms = ROOMS.filter(r => r.type === type && (!f || r.name.toLowerCase().includes(f)));
+    if (!rooms.length) continue;
+    shown += rooms.length;
+    h += `<div class="nav-group"><h2>${label}</h2>` + rooms.map(r => {
+      const st = roomStatus(r.id), n = both(r.id, s => s.incidents.length);
+      const cur = ui.view === 'room' && ui.room === r.id;
+      return `<button type="button" class="nav-item" data-go="${r.id}" ${cur ? 'aria-current="page"' : ''}>
+        <span class="dot ${st}" title="${STATUS_LABEL[st]}"></span><span>${esc(r.name)}</span>
+        ${n ? `<span class="count" title="${n} student${n > 1 ? 's' : ''} with a warning">${n}</span>` : ''}</button>`;
+    }).join('') + `</div>`;
+  }
+  if (f && !shown) h += `<p class="empty" style="padding:10px">No room matches “${esc(ui.filter)}”.</p>`;
+  $('#navList').innerHTML = h;
+  const rb = $('#reportBtn');
+  rb.hidden = !isAdmin();
+  if (ui.view === 'report') rb.setAttribute('aria-current', 'page'); else rb.removeAttribute('aria-current');
+}
+
+/* ---------- exam dropdowns ---------- */
+const programsLabel = () => PROGRAMS.filter(([c]) => cur.programs.includes(c)).map(([, l]) => l).join(' – ');
+const monthLabel = () => (monthOptions(cur.year).find(([m]) => m === cur.monthNum) || [0, ''])[1];
+function syncExam() {
+  EXAM.name = EXAM_TYPES.find(([c]) => c === cur.type)[1];
+  EXAM.levels = programsLabel();
+  EXAM.month = monthLabel();
+  EXAM.year = cur.year;
+  EXAM.term = cur.term;
+  const line = $('#examLine');
+  if (line) line.textContent = `${EXAM.name} · ${EXAM.month} · Term ${EXAM.term}`;
+}
+function examBand() {
+  const sel = (id, label, kind, opts, val, cls = '') => `<div class="bf ${cls}"><label for="${id}">${label}</label>
+    <select class="input" id="${id}" data-exam="${kind}">${opts.map(([v, l]) => `<option value="${esc(v)}" ${String(v) === String(val) ? 'selected' : ''}>${esc(l)}</option>`).join('')}</select></div>`;
+  return `<section class="band" aria-label="Exam details"><b>Salalah Vocational College</b>
+    <div class="bandgrid">
+      ${sel('ex-type', 'Exam', 'type', EXAM_TYPES, cur.type)}
+      ${sel('ex-term', 'Term', 'term', TERMS.map(t => [t, 'Term ' + t]), cur.term)}
+      <div class="bf wide"><label for="ex-programs">Programs</label><div class="ms">
+        <button type="button" class="input ms-btn" id="ex-programs" aria-expanded="false" aria-controls="ex-programs-pop"><span>${esc(programsLabel())}</span>${ICON.chev}</button>
+        <div class="ms-pop" id="ex-programs-pop" role="group" aria-label="Programs" hidden>${PROGRAMS.map(([c, l]) =>
+          `<label class="ms-opt" for="prog-${c}"><input type="checkbox" id="prog-${c}" data-prog="${c}" ${cur.programs.includes(c) ? 'checked' : ''}>${l}</label>`).join('')}</div>
+      </div></div>
+      ${sel('ex-month', 'Month', 'month', monthOptions(cur.year), cur.monthNum)}
+      ${sel('ex-year', 'Academic year', 'year', YEARS.map(y => [y, y]), cur.year)}
+    </div></section>`;
+}
+let msDirty = false;
+function setMs(open) {
+  const pop = $('#ex-programs-pop'), b = $('#ex-programs');
+  if (!pop || !b) return;
+  pop.hidden = !open; b.setAttribute('aria-expanded', String(open));
+  if (open) pop.querySelector('input')?.focus();
+  else if (msDirty) { msDirty = false; render(); $('#ex-programs')?.focus(); }
+}
+function onExamChange(kind, val, id) {
+  if (kind === 'month') {
+    cur.monthNum = +val; syncExam(); render();
+  } else {
+    const t = kind === 'type' ? val : cur.type, y = kind === 'year' ? val : cur.year, term = kind === 'term' ? +val : cur.term;
+    const isNew = !exams[examKey(t, y, term)];
+    cur = getExam(t, y, term, cur); S = cur.sessions;
+    syncExam(); render();
+    toast(isNew ? `${EXAM.name} · Term ${term} · ${y}: new blank sheets for every room` : `Switched to ${EXAM.name} · Term ${term} · ${y}`);
+  }
+  $('#' + id)?.focus();
+}
+function onProgramToggle(cb) {
+  const set = new Set(cur.programs);
+  if (cb.checked) set.add(cb.dataset.prog); else set.delete(cb.dataset.prog);
+  if (!set.size) { cb.checked = true; toast('Choose at least one program.'); return; }
+  cur.programs = PROGRAMS.map(([c]) => c).filter(c => set.has(c));
+  syncExam(); msDirty = true;
+  const lbl = $('#ex-programs span'); if (lbl) lbl.textContent = EXAM.levels;
+}
+
+/* ---------- room sheet ---------- */
+function statsHtml(s) {
+  const p = presentNum(s), a = s.absentees.length;
+  const lv = LEVELS.map(l => `<span class="lv ${l.cls}"><i></i>${l.short} ${s.incidents.filter(i => i.level === l.n).length}</span>`).join('');
+  return `
+    <div class="stat"><span class="k">Present</span><span class="v" id="st-present">${s.present === '' ? '—' : p}</span><span class="sub">Entered in session details</span></div>
+    <div class="stat"><span class="k">Absent</span><span class="v" id="st-absent">${a}</span><span class="sub">From the absentee list</span></div>
+    <div class="stat"><span class="k">Total</span><span class="v" id="st-total">${p + a}</span><span class="sub">Present + absent</span></div>
+    <div class="stat"><span class="k">Warnings</span><span class="v" id="st-inc">${s.incidents.length}</span><span class="sub">${lv}</span></div>`;
+}
+function lane(s, l) {
+  const items = s.incidents.filter(i => i.level === l.n);
+  const cards = items.map(i => {
+    const next = LEVELS[i.level];
+    return `<div class="inc">
+      <div class="name">${esc(i.name)}</div>
+      ${i.violation ? `<div class="row"><span class="chip">${esc(vLabel(i.violation))}</span></div>` : ''}
+      <div class="row">
+        ${next ? `<button type="button" class="btn sm ghost" data-act="escalate" data-id="${i.id}">Move to ${next.label}</button>` : ''}
+        <button type="button" class="btn sm ghost" data-act="remove-inc" data-id="${i.id}" aria-label="Remove ${esc(i.name)}">Remove</button>
+      </div></div>`;
+  }).join('');
+  return `<div class="lane ${l.cls}"><div class="lane-h"><span>${l.label}</span><span class="num">${items.length}</span></div>
+    <div class="lane-b">${cards || '<p class="empty">No students</p>'}</div></div>`;
+}
+function staffSelect(id, key, opts, val, other) {
+  const known = !val || opts.some(([v]) => v === val);
+  return `<select class="input" id="${id}" data-field="${key}" data-staff="${key}">
+    <option value="">Choose a name</option>
+    ${known ? '' : `<option value="${esc(val)}" selected>${esc(val)}</option>`}
+    ${opts.map(([v, l]) => `<option value="${esc(v)}" ${v === val ? 'selected' : ''} ${other && v === other ? 'disabled' : ''}>${esc(l)}</option>`).join('')}
+  </select>`;
+}
+function courseSelect(val) {
+  return `<select class="input" id="f-course" data-field="course">
+    <option value="">Choose a course</option>
+    ${COURSE_GROUPS.map(([g]) => `<optgroup label="${esc(g)}">${COURSES.filter(c => c.group === g).map(c =>
+      `<option value="${c.id}" ${c.id === val ? 'selected' : ''}>${esc(courseLabel(c.id))}</option>`).join('')}</optgroup>`).join('')}
+  </select>`;
+}
+function syncInvigilators() {
+  const s = sess();
+  [['#f-inv1', s.inv2], ['#f-inv2', s.inv1]].forEach(([sel, other]) => {
+    const el = $(sel); if (!el) return;
+    [...el.options].forEach(o => { o.disabled = !!other && o.value === other; });
+  });
+}
+function panelHtml(s, r) {
+  const periodLabel = PERIODS.find(p => p[0] === ui.period)[1];
+  const p = presentNum(s), a = s.absentees.length;
+  const students = `<datalist id="dl-students">${knownStudents().map(n => `<option value="${esc(n)}"></option>`).join('')}</datalist>`;
+  switch (ui.tab) {
+    case 'warnings':
+      return `<div class="panel-h"><h2>Warnings</h2><p class="lead">Add a student to give a first warning. Adding the same student again, or using Move, takes them to the next column.</p></div>
+        <form class="addrow" id="incForm" autocomplete="off">
+          ${field('inc-name', 'Student name', `<input class="input" id="inc-name" list="dl-students" required placeholder="Full name">`)}
+          ${field('inc-type', 'Reason', `<select class="input" id="inc-type"><option value="">Not specified</option>${VIOLATIONS.map(v => `<option value="${v.code}">${v.en} · ${v.ar}</option>`).join('')}</select>`)}
+          <button class="btn" type="submit">Add warning</button>
+        </form>
+        <div class="board">${LEVELS.map(l => lane(s, l)).join('')}</div>${students}`;
+    case 'absentees':
+      return `<div class="panel-h"><h2>Names of the absent students</h2><p class="lead">The absentee count and the total update from this list.</p></div>
+        <form class="addrow two" id="absForm" autocomplete="off">
+          ${field('abs-name', 'Student name', `<input class="input" id="abs-name" list="dl-students" required placeholder="Full name">`)}
+          <button class="btn" type="submit">Mark absent</button>
+        </form>
+        <div class="strip"><span>Absent students</span><span class="num">${a}</span></div>
+        ${a ? `<ol class="list">${s.absentees.map((n, i) => `<li><span class="idx">${i + 1}</span><span class="nm">${esc(n)}</span>
+          <button type="button" class="btn sm ghost" data-act="remove-abs" data-idx="${i}" aria-label="Remove ${esc(n)}">Remove</button></li>`).join('')}</ol>`
+          : '<p class="empty">No absentees recorded for this session.</p>'}${students}`;
+    case 'staff':
+      return `<div class="panel-h"><h2>Invigilators</h2><p class="lead">Names come from the staff list, so each person is spelled the same way on every sheet.</p></div>
+        <div class="form">
+          ${field('f-inv1', 'Invigilator (1)', staffSelect('f-inv1', 'inv1', INVIGILATORS.map(n => [n, n]), s.inv1, s.inv2), `${INVIGILATORS.length} names`)}
+          ${field('f-inv2', 'Invigilator (2)', staffSelect('f-inv2', 'inv2', INVIGILATORS.map(n => [n, n]), s.inv2, s.inv1), 'Leave empty if there is only one invigilator')}
+          ${field('f-floor', 'Floor invigilator', staffSelect('f-floor', 'floor', FLOOR_INVIGILATORS.map(([t, n]) => [n, [t, n].filter(Boolean).join(' ')]), s.floor, ''), `${FLOOR_INVIGILATORS.length} names`)}
+          ${field('f-coord', 'Coordinator', `<input class="input" id="f-coord" data-field="coord" list="dl-staff" value="${esc(s.coord)}" placeholder="Choose or type a name">`)}
+        </div>
+        <datalist id="dl-staff">${STAFF.map(n => `<option value="${esc(n)}"></option>`).join('')}</datalist>
+        <p class="empty">The same person can’t be chosen as Invigilator (1) and (2).</p>`;
+    case 'comments':
+      return `<div class="panel-h"><h2>Comments</h2><p class="lead">Tick what was observed during the session, then add the details.</p></div>
+        <div class="flags">${VIOLATIONS.map(v => `<label class="flag" for="flag-${v.code}"><input type="checkbox" id="flag-${v.code}" data-flag="${v.code}" ${s.flags[v.code] ? 'checked' : ''}><span>${v.en}</span><span class="ar" lang="ar">${v.ar}</span></label>`).join('')}</div>
+        ${field('f-comments', 'Notes', `<textarea class="input" id="f-comments" data-field="comments" rows="5" placeholder="What happened, and at what time">${esc(s.comments)}</textarea>`)}`;
+    case 'notice':
+      return `<div class="panel-h"><h2>Important notice</h2><p class="lead">Printed on every sheet of this exam. In the Oracle app it is stored once, in the exam record.</p></div>
+        <div class="notice"><p class="ar" dir="rtl" lang="ar">${EXAM.noticeAr}</p><p class="en">${EXAM.noticeEn}</p></div>`;
+    default:
+      return `<div class="panel-h"><h2>Session details</h2><p class="lead">${esc(r.name)} · ${periodLabel} session.</p></div>
+        <div class="form">
+          ${field('f-date', 'Date', `<input class="input" type="date" id="f-date" data-field="date" value="${esc(s.date)}">`)}
+          ${field('f-day', 'Day', `<input class="input" id="f-day" value="${esc(weekday(s.date))}" placeholder="Filled in from the date" readonly>`)}
+          ${field('f-course', 'Course name', courseSelect(s.course), `${COURSES.length} courses, grouped by specialization`)}
+          ${field('f-room', 'Classroom', `<input class="input" id="f-room" value="${esc(r.name)}" readonly>`)}
+          ${field('f-period', 'Period', `<input class="input" id="f-period" value="${periodLabel}" readonly>`)}
+          ${field('f-present', 'No. of present', `<input class="input num" type="number" min="0" inputmode="numeric" id="f-present" data-field="present" value="${esc(s.present)}" placeholder="0">`)}
+          ${field('f-absent', 'No. of absentees', `<input class="input num" id="f-absent" value="${a}" readonly>`, 'Counted from the absentee list')}
+          ${field('f-total', 'Total', `<input class="input num" id="f-total" value="${p + a}" readonly>`, 'Present + absentees')}
+        </div>`;
+  }
+}
+function viewRoom() {
+  const r = ROOMS.find(x => x.id === ui.room), s = sess(), st = status(s);
+  const tabBtns = TABS.map(([k, label]) => {
+    const n = k === 'warnings' ? s.incidents.length : k === 'absentees' ? s.absentees.length : null;
+    return `<button type="button" class="tab" role="tab" id="tab-${k}" data-tab="${k}" aria-selected="${ui.tab === k}" aria-controls="panel" tabindex="${ui.tab === k ? 0 : -1}">${label}${n !== null ? `<span class="n">${n}</span>` : ''}</button>`;
+  }).join('');
+  return `
+    <div class="crumbs"><button type="button" data-go="dashboard">Overview</button><span aria-hidden="true">›</span><span>${GROUPS.find(g => g[0] === r.type)[1]}</span><span aria-hidden="true">›</span><span>${esc(r.name)}</span></div>
+    ${examBand()}
+    <div class="roomhead">
+      <h1>${esc(r.name)}</h1><span class="pill ${st}" id="statusPill">${STATUS_LABEL[st]}</span>
+      <div class="seg" role="group" aria-label="Period">${PERIODS.map(([p, l]) => `<button type="button" data-period="${p}" aria-pressed="${ui.period === p}">${l}</button>`).join('')}</div>
+    </div>
+    <div class="stats" id="stats">${statsHtml(s)}</div>
+    <div class="tabs-wrap"><div class="tabs" role="tablist" aria-label="Sheet sections">${tabBtns}</div></div>
+    <section class="panel" role="tabpanel" id="panel" aria-labelledby="tab-${ui.tab}">${panelHtml(s, r)}</section>`;
+}
+function refreshDerived() {
+  const s = sess(); if (!s || ui.view !== 'room') return;
+  const p = presentNum(s), a = s.absentees.length, st = status(s);
+  const set = (sel, v, prop = 'textContent') => { const el = $(sel); if (el) el[prop] = v; };
+  set('#st-present', s.present === '' ? '—' : p);
+  set('#st-absent', a);
+  set('#st-total', p + a);
+  set('#f-day', weekday(s.date), 'value');
+  set('#f-absent', a, 'value');
+  set('#f-total', p + a, 'value');
+  const pill = $('#statusPill');
+  if (pill) { pill.className = 'pill ' + st; pill.textContent = STATUS_LABEL[st]; }
+  renderNav();
+}
+
+/* ---------- overview ---------- */
+function viewDashboard() {
+  const all = Object.values(S);
+  const started = all.filter(s => status(s) !== 'none').length;
+  const done = all.filter(s => status(s) === 'complete').length;
+  const warn = all.reduce((n, s) => n + s.incidents.length, 0);
+  const cr = all.reduce((n, s) => n + s.incidents.filter(i => i.level === 4).length, 0);
+  const abs = all.reduce((n, s) => n + s.absentees.length, 0);
+  const counts = GROUPS.map(([t, l]) => `${ROOMS.filter(r => r.type === t).length} ${l.toLowerCase()}`).join(' · ');
+  const rows = ROOMS.map(r => {
+    const m = S[r.id + '|MORNING'], a = S[r.id + '|AFTERNOON'], ms = status(m), as = status(a);
+    const staff = [...new Set([m.inv1, m.inv2, a.inv1, a.inv2].filter(Boolean))];
+    return `<tr>
+      <td><button type="button" class="linkbtn" data-go="${r.id}">${esc(r.name)}</button><div class="type">${TYPE_LABEL[r.type]}</div></td>
+      <td><span class="pill ${ms}">${STATUS_LABEL[ms]}</span></td>
+      <td><span class="pill ${as}">${STATUS_LABEL[as]}</span></td>
+      <td class="r num">${m.incidents.length + a.incidents.length}</td>
+      <td class="r num">${m.absentees.length + a.absentees.length}</td>
+      <td>${staff.length ? staff.map(esc).join('<br>') : '<span class="muted">—</span>'}</td>
+    </tr>`;
+  }).join('');
+  return `
+    ${examBand()}
+    <div class="pagehead"><h1>Exam day overview</h1>
+      <p class="lead">Every room for the exam chosen above.</p></div>
+    <div class="stats">
+      <div class="stat"><span class="k">Sessions started</span><span class="v">${started}</span><span class="sub">of ${all.length} · ${done} complete</span></div>
+      <div class="stat"><span class="k">Warnings</span><span class="v">${warn}</span><span class="sub">${cr} cheating report${cr === 1 ? '' : 's'}</span></div>
+      <div class="stat"><span class="k">Absentees</span><span class="v">${abs}</span><span class="sub">All rooms, both periods</span></div>
+      <div class="stat"><span class="k">Rooms</span><span class="v">${ROOMS.length}</span><span class="sub">${counts}</span></div>
+    </div>
+    <div class="sectionhead"><h2>Rooms</h2><p class="muted">Open a room to fill in its sheet.</p></div>
+    <div class="tablewrap"><table>
+      <thead><tr><th>Room</th><th>Morning</th><th>Afternoon</th><th class="r">Warnings</th><th class="r">Absent</th><th>Invigilators</th></tr></thead>
+      <tbody>${rows}</tbody></table></div>`;
+}
+
+/* ---------- end-of-day report (administrators only) ---------- */
+function reportRows() {
+  const src = ui.rep.source === 'example' ? EXAMPLE : S;
+  const rows = [];
+  ROOMS.forEach(r => PERIODS.forEach(([p, pl]) => {
+    if (ui.rep.period !== 'ALL' && ui.rep.period !== p) return;
+    if (ui.rep.type !== 'ALL' && ui.rep.type !== r.type) return;
+    const s = src[r.id + '|' + p];
+    rows.push({ room: r, period: p, periodLabel: pl, s, st: status(s), present: presentNum(s), absent: s.absentees.length });
+  }));
+  return rows;
+}
+function reportStats(rows) {
+  const k = { sessions: rows.length, done: 0, progress: 0, none: 0, present: 0, absent: 0, lv: [0, 0, 0, 0], reasons: {}, reported: 0 };
+  rows.forEach(x => {
+    k[x.st === 'complete' ? 'done' : x.st]++;
+    k.present += x.present; k.absent += x.absent;
+    if (x.s.present !== '') k.reported++;
+    x.s.incidents.forEach(i => { k.lv[i.level - 1]++; const key = i.violation || 'NONE'; k.reasons[key] = (k.reasons[key] || 0) + 1; });
+  });
+  k.warn = k.lv.reduce((a, b) => a + b, 0);
+  k.rate = k.present + k.absent ? Math.round(k.present / (k.present + k.absent) * 1000) / 10 : null;
+  return k;
+}
+const mk = (val, label) => `tabindex="0" data-tip-v="${esc(val)}" data-tip-l="${esc(label)}" title="${esc(val + ' · ' + label)}"`;
+function chartProgress(k) {
+  const parts = [['done', 'Complete', 'var(--ok)'], ['progress', 'In progress', 'var(--amber)'], ['none', 'Not started', 'var(--st-none)']];
+  const total = k.sessions || 1;
+  const bar = parts.filter(([key]) => k[key] > 0).map(([key, label, c]) =>
+    `<span class="mk" style="--c:${c};flex:${k[key]} 1 0" ${mk(k[key] + ' · ' + Math.round(k[key] / total * 100) + '%', label + ' sessions')}></span>`).join('');
+  return `<figure class="chart wide"><figcaption><h3>Session progress</h3><p>${k.sessions} sessions in this view</p></figcaption>
+    <div class="thinbar" role="img" aria-label="${parts.map(([key, l]) => `${l} ${k[key]}`).join(', ')}">${bar}</div>
+    <div class="keyrow">${parts.map(([key, l, c]) => `<span><i class="sw-k" style="--c:${c}"></i>${l} <b>${k[key]}</b></span>`).join('')}</div></figure>`;
+}
+function chartLevels(k) {
+  const max = Math.max(1, ...k.lv);
+  return `<figure class="chart"><figcaption><h3>Warnings by level</h3><p>${k.warn} student${k.warn === 1 ? '' : 's'} warned</p></figcaption>
+    ${k.warn ? `<div><div class="colplot">${LEVELS.map((l, i) => `<div class="colslot ${l.cls}"><span class="colval">${k.lv[i]}</span>
+      <span class="colbar mk" style="height:calc((100% - 26px) * ${(k.lv[i] / max).toFixed(3)})" ${mk(String(k.lv[i]), l.label)}></span></div>`).join('')}</div>
+    <div class="collabels">${LEVELS.map(l => `<span>${l.label}</span>`).join('')}</div></div>` : '<p class="empty">No warnings recorded yet.</p>'}</figure>`;
+}
+function hbars(items, colorVar, unit) {
+  const max = Math.max(1, ...items.map(x => x.v));
+  return `<div class="hbars">${items.map(x => `<div class="hrow"><span class="hl">${esc(x.label)}</span>
+    <span class="htrack"><span class="hseg mk" style="--c:${colorVar};width:${(x.v / max * 100).toFixed(2)}%" ${mk(x.v + ' ' + unit, x.label)}></span></span>
+    <span class="hv">${x.v}</span></div>`).join('')}</div>`;
+}
+function chartReasons(k) {
+  const items = [...VIOLATIONS.map(v => ({ label: v.en, v: k.reasons[v.code] || 0 })), { label: 'Not specified', v: k.reasons.NONE || 0 }];
+  return `<figure class="chart"><figcaption><h3>Warnings by reason</h3><p>From the reason chosen on each warning</p></figcaption>
+    ${k.warn ? hbars(items, 'var(--brand)', 'warnings') : '<p class="empty">No warnings recorded yet.</p>'}</figure>`;
+}
+function byRoom(rows) {
+  const m = new Map();
+  rows.forEach(x => {
+    const e = m.get(x.room.id) || { room: x.room, present: 0, absent: 0, warn: 0 };
+    e.present += x.present; e.absent += x.absent; e.warn += x.s.incidents.length;
+    m.set(x.room.id, e);
+  });
+  return [...m.values()];
+}
+function chartRoomWarnings(rows) {
+  const items = byRoom(rows).filter(e => e.warn > 0).sort((a, b) => b.warn - a.warn || a.room.order - b.room.order).slice(0, 8)
+    .map(e => ({ label: e.room.name, v: e.warn }));
+  return `<figure class="chart"><figcaption><h3>Rooms with the most warnings</h3><p>Ranked by number of warnings</p></figcaption>
+    ${items.length ? hbars(items, 'var(--brand)', 'warnings') : '<p class="empty">No warnings recorded yet.</p>'}</figure>`;
+}
+function periodCompare(rows) {
+  const per = PERIODS.filter(([p]) => rows.some(x => x.period === p));
+  const calc = p => reportStats(rows.filter(x => x.period === p));
+  const ks = per.map(([p]) => calc(p));
+  const line = (label, fn) => `<tr><td>${label}</td>${ks.map(k => `<td class="r num">${fn(k)}</td>`).join('')}</tr>`;
+  return `<figure class="chart"><figcaption><h3>Morning and afternoon</h3><p>The same measures side by side</p></figcaption>
+    <table class="mini"><thead><tr><th>Measure</th>${per.map(([, l]) => `<th class="r">${l}</th>`).join('')}</tr></thead><tbody>
+    ${line('Students present', k => k.present)}${line('Absent', k => k.absent)}
+    ${line('Attendance', k => k.rate === null ? '—' : k.rate + '%')}
+    ${line('Warnings', k => k.warn)}${line('Cheating reports', k => k.lv[3])}
+    ${line('Sessions complete', k => `${k.done} / ${k.sessions}`)}</tbody></table></figure>`;
+}
+function chartAttendance(rows) {
+  const items = byRoom(rows).filter(e => e.present + e.absent > 0);
+  const max = Math.max(1, ...items.map(e => e.present + e.absent));
+  const body = items.map(e => {
+    const t = e.present + e.absent;
+    const segs = [['var(--brand)', e.present, 'present'], ['var(--absent)', e.absent, 'absent']].filter(x => x[1] > 0)
+      .map(([c, v, l]) => `<span class="hseg mk" style="--c:${c};width:calc(${(v / max * 100).toFixed(2)}% - 1px)" ${mk(v + ' ' + l, e.room.name)}></span>`).join('');
+    return `<div class="hrow"><span class="hl">${esc(e.room.name)}</span><span class="htrack">${segs}</span><span class="hv">${t}</span></div>`;
+  }).join('');
+  return `<figure class="chart wide"><figcaption><h3>Attendance by room</h3><p>Students present and absent; the number is the room total</p></figcaption>
+    <div class="keyrow"><span><i class="sw-k" style="--c:var(--brand)"></i>Present</span><span><i class="sw-k" style="--c:var(--absent)"></i>Absent</span></div>
+    ${items.length ? `<div class="hbars">${body}</div>` : '<p class="empty">No attendance entered yet. Present counts come from each room’s session details.</p>'}</figure>`;
+}
+function sessionsTable(rows) {
+  return `<div class="tablewrap"><table style="min-width:980px"><thead><tr><th>Room</th><th>Period</th><th>Course</th><th class="r">Present</th><th class="r">Absent</th><th class="r">Total</th>
+    ${LEVELS.map(l => `<th class="r">${l.short}</th>`).join('')}<th>Invigilator (1)</th><th>Status</th></tr></thead><tbody>
+    ${rows.map(x => `<tr><td>${esc(x.room.name)}</td><td>${x.periodLabel}</td><td>${esc(courseLabel(x.s.course)) || '<span class="muted">—</span>'}</td>
+      <td class="r num">${x.s.present === '' ? '—' : x.present}</td><td class="r num">${x.absent}</td><td class="r num">${x.present + x.absent}</td>
+      ${LEVELS.map(l => `<td class="r num">${x.s.incidents.filter(i => i.level === l.n).length}</td>`).join('')}
+      <td>${esc(x.s.inv1) || '<span class="muted">—</span>'}</td><td><span class="pill ${x.st}">${STATUS_LABEL[x.st]}</span></td></tr>`).join('')}
+    </tbody></table></div>`;
+}
+function warningsTable(rows) {
+  const list = [];
+  rows.forEach(x => x.s.incidents.forEach(i => list.push({ x, i })));
+  list.sort((a, b) => b.i.level - a.i.level || a.x.room.order - b.x.room.order);
+  if (!list.length) return '<p class="empty">No warnings recorded yet.</p>';
+  return `<div class="tablewrap"><table><thead><tr><th>Level</th><th>Student</th><th>Room</th><th>Period</th><th>Reason</th></tr></thead><tbody>
+    ${list.map(({ x, i }) => { const l = LEVELS[i.level - 1]; return `<tr><td><span class="lv ${l.cls}"><i></i>${l.label}</span></td><td>${esc(i.name)}</td><td>${esc(x.room.name)}</td><td>${x.periodLabel}</td><td>${esc(vLabel(i.violation)) || '<span class="muted">Not specified</span>'}</td></tr>`; }).join('')}
+    </tbody></table></div>`;
+}
+function reportBody(rows, k) {
+  return `
+    <div class="stats six">
+      <div class="stat"><span class="k">Sessions complete</span><span class="v">${k.done}</span><span class="sub">of ${k.sessions} · ${k.progress} in progress</span></div>
+      <div class="stat"><span class="k">Students present</span><span class="v">${k.present.toLocaleString('en-GB')}</span><span class="sub">${k.reported} sessions reported</span></div>
+      <div class="stat"><span class="k">Absent</span><span class="v">${k.absent}</span><span class="sub">From the absentee lists</span></div>
+      <div class="stat"><span class="k">Attendance</span><span class="v">${k.rate === null ? '—' : k.rate + '%'}</span><span class="sub">Present ÷ (present + absent)</span></div>
+      <div class="stat"><span class="k">Warnings</span><span class="v">${k.warn}</span><span class="sub">${LEVELS.slice(0, 3).map((l, i) => `<span class="lv ${l.cls}"><i></i>${l.short} ${k.lv[i]}</span>`).join('')}</span></div>
+      <div class="stat"><span class="k">Cheating reports</span><span class="v">${k.lv[3]}</span><span class="sub">To follow up</span></div>
+    </div>
+    <div class="charts">
+      ${chartProgress(k)}
+      ${chartLevels(k)}
+      ${chartReasons(k)}
+      ${chartRoomWarnings(rows)}
+      ${periodCompare(rows)}
+      ${chartAttendance(rows)}
+    </div>
+    <div class="sectionhead"><h2>All sessions</h2><p class="muted">${rows.length} rows</p></div>
+    ${sessionsTable(rows)}
+    <div class="sectionhead"><h2>Warnings and cheating reports</h2><p class="muted">Highest level first</p></div>
+    ${warningsTable(rows)}`;
+}
+function viewReport() {
+  const rows = reportRows(), k = reportStats(rows);
+  const segBtns = (key, opts) => opts.map(([v, l]) => `<button type="button" data-rep="${key}" data-val="${v}" aria-pressed="${ui.rep[key] === v}">${l}</button>`).join('');
+  return `
+    <div class="pagehead-row">
+      <div class="pagehead"><p class="eyebrow">${ICON.lock} Administrator only</p><h1>End-of-day report</h1>
+        <p class="lead">${EXAM.name} · Term ${EXAM.term} · ${EXAM.year} · ${EXAM.levels} · ${TODAY_LABEL}</p></div>
+      <div class="dlbar">
+        <button type="button" class="btn" data-dl="xlsx">${ICON.down}Excel</button>
+        <button type="button" class="btn ghost" data-dl="csv">${ICON.down}CSV</button>
+        <button type="button" class="btn ghost" data-dl="html">${ICON.down}Dashboard</button>
+      </div>
+    </div>
+    ${examBand()}
+    <div class="filters">
+      <div class="filter"><span>Data</span><div class="seg sm" role="group" aria-label="Data">${segBtns('source', [['example', 'Example day'], ['entries', 'Your entries']])}</div></div>
+      <div class="filter"><span>Period</span><div class="seg sm" role="group" aria-label="Period">${segBtns('period', [['ALL', 'Both'], ['MORNING', 'Morning'], ['AFTERNOON', 'Afternoon']])}</div></div>
+      <div class="filter"><span>Rooms</span><div class="seg sm" role="group" aria-label="Rooms">${segBtns('type', [['ALL', 'All'], ['ROOM', 'Classrooms'], ['LAB', 'Labs'], ['HALL', 'Halls']])}</div></div>
+    </div>
+    ${ui.rep.source === 'example' ? '<p class="examplenote"><b>Example figures.</b> A made-up full exam day, so you can judge the charts. Students appear as numbers, not real names. Choose “Your entries” to see what has been typed into the room sheets.</p>' : ''}
+    ${reportBody(rows, k)}`;
+}
+
+/* ---------- downloads ---------- */
+let dlPromise = null;
+function getDownloads() {
+  if (dlPromise) return dlPromise;
+  if (window.claude && typeof window.claude.use === 'function') {
+    dlPromise = Promise.resolve(window.claude.use('downloads')).catch(() => null);
+    return dlPromise;
+  }
+  return Promise.resolve(null);
+}
+const MIME = { xlsx: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', csv: 'text/csv;charset=utf-8', html: 'text/html;charset=utf-8' };
+function browserDownload(filename, data) {
+  const ext = filename.split('.').pop();
+  const blob = data instanceof Blob ? data : new Blob([data], { type: MIME[ext] || 'application/octet-stream' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = filename;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 4000);
+  toast(`Downloaded ${filename}`);
+}
+async function saveFile(filename, data) {
+  const dl = await getDownloads();
+  if (!dl) { browserDownload(filename, data); return; }
+  try {
+    const res = await dl.save({ filename, data });
+    if (res && res.status === 'saved') toast(`Saved ${filename}`);
+  } catch (err) {
+    const c = err && err.code;
+    if (c === 'declined') return;
+    if (c === 'rate_limited') toast('A download is already waiting for your answer.');
+    else toast('This file couldn’t be saved here.');
+  }
+}
+function records(rows) {
+  const sessions = rows.map(x => ({
+    Room: x.room.name, Type: TYPE_LABEL[x.room.type], Period: x.periodLabel, Date: x.s.date, Day: weekday(x.s.date), 'Course code': (COURSE_BY_ID[x.s.course] || {}).code || '', Course: (COURSE_BY_ID[x.s.course] || {}).name || '',
+    Present: x.s.present === '' ? '' : x.present, Absent: x.absent, Total: x.present + x.absent,
+    'Warning 1': x.s.incidents.filter(i => i.level === 1).length, 'Warning 2': x.s.incidents.filter(i => i.level === 2).length,
+    'Warning 3': x.s.incidents.filter(i => i.level === 3).length, 'Cheating report': x.s.incidents.filter(i => i.level === 4).length,
+    'Invigilator (1)': x.s.inv1, 'Invigilator (2)': x.s.inv2, 'Floor invigilator': x.s.floor ? floorLabel(x.s.floor) : '', Coordinator: x.s.coord,
+    Observed: VIOLATIONS.filter(v => x.s.flags[v.code]).map(v => v.en).join(', '), Comments: x.s.comments, Status: STATUS_LABEL[x.st]
+  }));
+  const warnings = [], absentees = [];
+  rows.forEach(x => {
+    x.s.incidents.forEach(i => warnings.push({ Room: x.room.name, Period: x.periodLabel, Student: i.name, Level: LEVELS[i.level - 1].label,
+      Reason: (VIOLATIONS.find(v => v.code === i.violation) || {}).en || 'Not specified' }));
+    x.s.absentees.forEach(n => absentees.push({ Room: x.room.name, Period: x.periodLabel, Student: n }));
+  });
+  return { sessions, warnings, absentees };
+}
+const filterLabel = () => [ui.rep.source === 'example' ? 'Example day' : 'Your entries',
+  ui.rep.period === 'ALL' ? 'Both periods' : PERIODS.find(p => p[0] === ui.rep.period)[1],
+  ui.rep.type === 'ALL' ? 'All rooms' : GROUPS.find(g => g[0] === ui.rep.type)[1]].join(' · ');
+let xlsxLoading = null;
+function loadXLSX() {
+  if (window.XLSX) return Promise.resolve(window.XLSX);
+  if (!xlsxLoading) xlsxLoading = new Promise((res, rej) => {
+    const sc = document.createElement('script');
+    sc.src = 'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';
+    sc.onload = () => res(window.XLSX);
+    sc.onerror = () => { xlsxLoading = null; rej(new Error('load')); };
+    document.head.appendChild(sc);
+  });
+  return xlsxLoading;
+}
+async function downloadExcel() {
+  toast('Preparing the Excel file…');
+  let X;
+  try { X = await loadXLSX(); } catch (e) { toast('The Excel tool didn’t load. Check the connection and try again.'); return; }
+  const rows = reportRows(), k = reportStats(rows), rec = records(rows);
+  const wb = X.utils.book_new();
+  const summary = [
+    ['Salalah Vocational College'], ['End-of-day report', TODAY_LABEL], ['Exam', `${EXAM.name} · ${EXAM.levels} · ${EXAM.month}`],
+    ['Academic year', EXAM.year], ['Term', EXAM.term], ['Filters', filterLabel()], [],
+    ['Measure', 'Value'], ['Sessions', k.sessions], ['Sessions complete', k.done], ['Sessions in progress', k.progress], ['Sessions not started', k.none],
+    ['Students present', k.present], ['Absent', k.absent], ['Attendance %', k.rate === null ? '' : k.rate],
+    ['Warning 1', k.lv[0]], ['Warning 2', k.lv[1]], ['Warning 3', k.lv[2]], ['Cheating reports', k.lv[3]]
+  ];
+  const add = (name, ws, widths) => { ws['!cols'] = widths.map(w => ({ wch: w })); X.utils.book_append_sheet(wb, ws, name); };
+  add('Summary', X.utils.aoa_to_sheet(summary), [24, 52]);
+  add('Sessions', X.utils.json_to_sheet(rec.sessions), [18, 12, 10, 11, 10, 12, 34, 8, 8, 7, 9, 9, 9, 14, 30, 30, 34, 26, 26, 30, 12]);
+  add('Warnings', rec.warnings.length ? X.utils.json_to_sheet(rec.warnings) : X.utils.aoa_to_sheet([['Room', 'Period', 'Student', 'Level', 'Reason']]), [18, 10, 34, 16, 18]);
+  add('Absentees', rec.absentees.length ? X.utils.json_to_sheet(rec.absentees) : X.utils.aoa_to_sheet([['Room', 'Period', 'Student']]), [18, 10, 34]);
+  const out = X.write(wb, { bookType: 'xlsx', type: 'array' });
+  await saveFile(`SVC-day-report-${TODAY_ISO}.xlsx`, new Uint8Array(out));
+}
+function downloadCsv() {
+  const rec = records(reportRows()).sessions;
+  const cols = Object.keys(rec[0] || { Room: '' });
+  const q = v => { const s = String(v ?? ''); return /[",\n\r]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s; };
+  const csv = '﻿' + [cols.join(','), ...rec.map(r => cols.map(c => q(r[c])).join(','))].join('\r\n');
+  saveFile(`SVC-sessions-${TODAY_ISO}.csv`, csv);
+}
+function downloadDashboard() {
+  const rows = reportRows(), k = reportStats(rows);
+  const css = document.getElementById('appcss').textContent;
+  const vars = document.documentElement.style.cssText;
+  const mode = document.documentElement.getAttribute('data-mode');
+  const doc = `<!doctype html><html lang="en"${mode ? ` data-mode="${mode}"` : ''}><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SVC end-of-day report ${TODAY_ISO}</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500&family=IBM+Plex+Sans+Arabic:wght@400;500;600&family=Readex+Pro:wght@500;600;700&display=swap">
+<style>${css}
+:root{${vars}}
+body{margin:0}main{padding:28px max(16px,4vw) 40px}.mk{cursor:help}
+</style></head><body><main><div class="wrap">
+<div class="band"><b>Salalah Vocational College</b><span>${EXAM.name} · ${EXAM.levels} · ${EXAM.month}</span><span>Academic year ${EXAM.year} · Term ${EXAM.term}</span></div>
+<div class="pagehead"><p class="eyebrow">End-of-day report</p><h1>${TODAY_LABEL}</h1><p class="lead">${filterLabel()}. Hover over a bar to see its value.</p></div>
+${ui.rep.source === 'example' ? '<p class="examplenote"><b>Example figures.</b> A made-up full exam day for preview.</p>' : ''}
+${reportBody(rows, k)}
+<footer class="foot"><span>Exported from SVC Exam Portal on ${TODAY_LABEL}.</span><span>Developer: <b>Ms. Amina Qatan</b></span></footer>
+</div></main></body></html>`;
+  saveFile(`SVC-day-report-${TODAY_ISO}.html`, doc);
+}
+
+/* ---------- page ---------- */
+const footer = () => `<footer class="foot"><span>Preview only. Edits stay on this screen until you reload; the Oracle app saves every change to the database.</span><span>Developer: <b>Ms. Amina Qatan</b></span></footer>`;
+function render() {
+  renderNav();
+  $('#tip').hidden = true;
+  const v = $('#view');
+  v.innerHTML = (ui.view === 'report' ? viewReport() : ui.view === 'dashboard' ? viewDashboard() : viewRoom()) + footer();
+  if (typeof pushPresence === 'function') pushPresence();
+}
+
+/* ---------- routing ---------- */
+function applyRoute(name) {
+  const before = ui.view + ':' + ui.room;
+  if (name === 'day-report') {
+    if (isAdmin()) ui.view = 'report';
+    else if (ui.identity === 'pending') { ui.view = 'dashboard'; ui.pendingRoute = 'day-report'; }
+    else { ui.view = 'dashboard'; toast('Only the administrator can open the end-of-day report.'); }
+  } else if (name === 'dashboard') ui.view = 'dashboard';
+  else {
+    const r = ROOMS.find(x => x.id === name) || ROOMS.find(x => x.id === 'room-13');
+    if (ui.room !== r.id) { ui.tab = 'details'; ui.period = 'MORNING'; }
+    ui.view = 'room'; ui.room = r.id;
+  }
+  render(); closeNav();
+  if (before !== ui.view + ':' + ui.room) window.scrollTo(0, 0);
+}
+function go(name) {
+  applyRoute(name);
+  try { if (location.hash !== '#' + name) location.hash = name; } catch (e) { /* hash not available */ }
+}
+window.addEventListener('hashchange', () => applyRoute(decodeURIComponent(location.hash.slice(1))));
+
+/* ---------- drawers and role ---------- */
+function syncScrim() { $('#scrim').hidden = !(document.body.classList.contains('nav-open') || !$('#themePanel').hidden || !$('#chatPanel').hidden); }
+function openNav() { document.body.classList.add('nav-open'); $('#menuBtn').setAttribute('aria-expanded', 'true'); syncScrim(); }
+function closeNav() { document.body.classList.remove('nav-open'); $('#menuBtn').setAttribute('aria-expanded', 'false'); syncScrim(); }
+$('#menuBtn').addEventListener('click', () => document.body.classList.contains('nav-open') ? closeNav() : openNav());
+$('#scrim').addEventListener('click', () => { closeNav(); closeTheme(); closeChat(); });
+document.addEventListener('keydown', e => {
+  if (e.key !== 'Escape') return;
+  const pop = $('#ex-programs-pop');
+  if (pop && !pop.hidden) { setMs(false); $('#ex-programs')?.focus(); return; }
+  if (!$('#chatPanel').hidden) { closeChat(); $('#chatBtn').focus(); return; }
+  closeNav(); if (!$('#themePanel').hidden) closeTheme(); $('#tip').hidden = true;
+});
+$('#roomSearch').addEventListener('input', e => { ui.filter = e.target.value; renderNav(); });
+$('#sidenav').addEventListener('click', e => { const b = e.target.closest('[data-go]'); if (b) go(b.dataset.go); });
+$('#reportBtn').addEventListener('click', () => go('day-report'));
+$('#roleSelect').addEventListener('change', e => {
+  if (ui.identity === 'staff') return;
+  ui.role = e.target.value;
+  if (!isAdmin() && ui.view === 'report') { ui.view = 'dashboard'; try { location.hash = 'dashboard'; } catch (er) { /* ignore */ } }
+  render();
+  toast(isAdmin() ? 'Viewing as the administrator. The Day report icon is shown.' : `Viewing as ${ROLES[ui.role].toLowerCase()}. The Day report icon is hidden.`);
+});
+
+/* ---------- interactions in the working area ---------- */
+const view = $('#view');
+const tip = $('#tip');
+function showTip(el, x, y) {
+  const v = document.createElement('strong'); v.textContent = el.dataset.tipV;
+  const l = document.createElement('span'); l.textContent = el.dataset.tipL;
+  tip.replaceChildren(v, l); tip.hidden = false;
+  const r = tip.getBoundingClientRect();
+  let left = x + 14, top = y + 14;
+  if (left + r.width > innerWidth - 8) left = x - r.width - 14;
+  if (top + r.height > innerHeight - 8) top = y - r.height - 14;
+  tip.style.left = Math.max(8, left) + 'px'; tip.style.top = Math.max(8, top) + 'px';
+}
+view.addEventListener('pointermove', e => { const m = e.target.closest('[data-tip-v]'); if (m) showTip(m, e.clientX, e.clientY); else tip.hidden = true; });
+view.addEventListener('pointerleave', () => { tip.hidden = true; });
+view.addEventListener('focusin', e => { const m = e.target.closest('[data-tip-v]'); if (m) { const r = m.getBoundingClientRect(); showTip(m, r.left + r.width / 2, r.bottom); } });
+view.addEventListener('focusout', () => { tip.hidden = true; });
+window.addEventListener('scroll', () => { tip.hidden = true; }, { passive: true });
+
+view.addEventListener('change', e => {
+  const t = e.target;
+  if (t.dataset.exam) onExamChange(t.dataset.exam, t.value, t.id);
+  else if (t.dataset.prog) onProgramToggle(t);
+});
+document.addEventListener('click', e => {
+  const pop = $('#ex-programs-pop');
+  if (pop && !pop.hidden && !e.target.closest('.ms')) setMs(false);
+});
+view.addEventListener('click', e => {
+  if (e.target.closest('#ex-programs')) { const pop = $('#ex-programs-pop'); setMs(pop ? pop.hidden : false); return; }
+  const goBtn = e.target.closest('[data-go]');
+  if (goBtn) { go(goBtn.dataset.go); return; }
+  const rep = e.target.closest('[data-rep]');
+  if (rep) { ui.rep[rep.dataset.rep] = rep.dataset.val; render(); $(`[data-rep="${rep.dataset.rep}"][data-val="${rep.dataset.val}"]`)?.focus(); return; }
+  const dl = e.target.closest('[data-dl]');
+  if (dl) {
+    if (!isAdmin()) { toast('Only the administrator can download the report.'); return; }
+    if (dl.dataset.dl === 'xlsx') downloadExcel(); else if (dl.dataset.dl === 'csv') downloadCsv(); else downloadDashboard();
+    return;
+  }
+  const per = e.target.closest('[data-period]');
+  if (per) { ui.period = per.dataset.period; render(); $(`[data-period="${ui.period}"]`)?.focus(); return; }
+  const tab = e.target.closest('[data-tab]');
+  if (tab) { ui.tab = tab.dataset.tab; render(); $('#tab-' + ui.tab)?.focus(); return; }
+  const act = e.target.closest('[data-act]');
+  if (!act) return;
+  const s = sess();
+  if (act.dataset.act === 'escalate') {
+    const inc = s.incidents.find(i => i.id === +act.dataset.id);
+    if (inc && inc.level < 4) { inc.level++; render(); toast(`${inc.name} moved to ${LEVELS[inc.level - 1].label}`); }
+  } else if (act.dataset.act === 'remove-inc') {
+    const i = s.incidents.findIndex(x => x.id === +act.dataset.id);
+    if (i > -1) { const [gone] = s.incidents.splice(i, 1); render(); toast(`Removed ${gone.name}`); }
+  } else if (act.dataset.act === 'remove-abs') {
+    const [gone] = s.absentees.splice(+act.dataset.idx, 1); render(); toast(`Removed ${gone} from the absentee list`);
+  }
+});
+view.addEventListener('keydown', e => {
+  const t = e.target.closest('[role="tab"]');
+  if (!t || !['ArrowRight', 'ArrowLeft', 'Home', 'End'].includes(e.key)) return;
+  e.preventDefault();
+  const keys = TABS.map(x => x[0]), i = keys.indexOf(ui.tab);
+  const n = e.key === 'Home' ? 0 : e.key === 'End' ? keys.length - 1 : (i + (e.key === 'ArrowRight' ? 1 : -1) + keys.length) % keys.length;
+  ui.tab = keys[n]; render(); $('#tab-' + ui.tab)?.focus();
+});
+view.addEventListener('input', e => {
+  const s = sess(); if (!s || ui.view !== 'room') return;
+  const el = e.target;
+  if (el.dataset.field) { s[el.dataset.field] = el.value; if (el.dataset.staff) syncInvigilators(); refreshDerived(); }
+  else if (el.dataset.flag) { s.flags[el.dataset.flag] = el.checked; }
+});
+view.addEventListener('change', e => {
+  const s = sess(); if (!s || ui.view !== 'room') return;
+  if (e.target.dataset.flag) s.flags[e.target.dataset.flag] = e.target.checked;
+});
+view.addEventListener('submit', e => {
+  e.preventDefault();
+  const s = sess(); if (!s) return;
+  if (e.target.id === 'incForm') {
+    const name = clean($('#inc-name').value), type = $('#inc-type').value;
+    if (!name) return;
+    const found = s.incidents.find(i => i.name.toLowerCase() === name.toLowerCase());
+    if (found) {
+      if (found.level >= 4) { toast(`${found.name} already has a cheating report`); return; }
+      found.level++; if (type) found.violation = type;
+      render(); toast(`${found.name} moved to ${LEVELS[found.level - 1].label}`);
+    } else {
+      s.incidents.push({ id: uid++, name, level: 1, violation: type });
+      render(); toast(`${name} added to Warning 1`);
+    }
+    $('#inc-name')?.focus();
+  } else if (e.target.id === 'absForm') {
+    const name = clean($('#abs-name').value);
+    if (!name) return;
+    if (s.absentees.some(n => n.toLowerCase() === name.toLowerCase())) { toast(`${name} is already on the list`); return; }
+    s.absentees.push(name); render(); toast(`${name} marked absent`);
+    $('#abs-name')?.focus();
+  }
+});
+
+/* ---------- colour themes ---------- */
+const PRESETS = {
+  SHEET:        { name: 'Sheet Classic', note: 'The colours of your exam sheet', primary: '#3E7C87', banner: '#19D3E0', w1: '#F2A43A', w2: '#8AB4F0', w3: '#E53935', w4: '#E9B824', notice: '#16BFD1', absent: '#F4D514' },
+  KHAREEF:      { name: 'Khareef Green', note: 'The greens of the Salalah monsoon', primary: '#2D7A4E', banner: '#6DBE8C', w1: '#E9A23B', w2: '#86B7DE', w3: '#D64545', w4: '#CFA72E', notice: '#3FB58F', absent: '#E9D45E' },
+  FRANKINCENSE: { name: 'Frankincense', note: 'Warm resin and stone', primary: '#8A5A2C', banner: '#D2A86A', w1: '#E39E48', w2: '#A2B9D4', w3: '#C6463B', w4: '#D9B23C', notice: '#C49A62', absent: '#EAD27C' },
+  ARABIAN_SEA:  { name: 'Arabian Sea', note: 'Deep blues', primary: '#1F4F8A', banner: '#4A98D6', w1: '#F0A94B', w2: '#93BCEE', w3: '#E0473F', w4: '#E4B530', notice: '#2CA9CC', absent: '#EFD55E' },
+  SLATE:        { name: 'Slate', note: 'Quiet greys for long sessions', primary: '#3B4553', banner: '#8796A8', w1: '#E2A55A', w2: '#A9BCD5', w3: '#D2554F', w4: '#CDAA48', notice: '#7D9AAE', absent: '#DCCB7C' }
+};
+const COLOR_KEYS = [['primary','Primary'],['banner','Banner'],['w1','Warning 1'],['w2','Warning 2'],['w3','Warning 3'],['w4','Cheating report'],['notice','Notice'],['absent','Absent list']];
+const pick = p => Object.fromEntries(COLOR_KEYS.map(([k]) => [k, p[k]]));
+let theme = { base: 'SHEET', custom: false, mode: 'auto', colors: pick(PRESETS.SHEET) };
+const KEY = 'svc-portal-theme';
+try {
+  const t = JSON.parse(localStorage.getItem(KEY) || 'null');
+  if (t && PRESETS[t.base]) {
+    const colors = pick(PRESETS[t.base]);
+    if (t.colors) COLOR_KEYS.forEach(([k]) => { if (/^#[0-9a-f]{6}$/i.test(t.colors[k] || '')) colors[k] = t.colors[k]; });
+    theme = { base: t.base, custom: !!t.custom, mode: ['auto','light','dark'].includes(t.mode) ? t.mode : 'auto', colors };
+  }
+} catch (e) { /* storage unavailable */ }
+const save = () => { try { localStorage.setItem(KEY, JSON.stringify(theme)); } catch (e) { /* storage unavailable */ } };
+
+const hex2rgb = h => { const n = parseInt(h.slice(1), 16); return [n >> 16 & 255, n >> 8 & 255, n & 255]; };
+const rgb2hex = a => '#' + a.map(v => Math.round(Math.min(255, Math.max(0, v))).toString(16).padStart(2, '0')).join('').toUpperCase();
+const lum = ([r, g, b]) => { const f = v => { v /= 255; return v <= .03928 ? v / 12.92 : Math.pow((v + .055) / 1.055, 2.4); }; return .2126 * f(r) + .7152 * f(g) + .0722 * f(b); };
+const contrast = (a, b) => { const x = lum(a), y = lum(b); return (Math.max(x, y) + .05) / (Math.min(x, y) + .05); };
+const ink = h => { const c = hex2rgb(h); return contrast(c, [255, 255, 255]) >= contrast(c, [17, 26, 29]) ? '#FFFFFF' : '#111A1D'; };
+function readable(h, bg, lighten) {
+  const c = hex2rgb(h), b = hex2rgb(bg), t = lighten ? [255, 255, 255] : [0, 0, 0];
+  for (let k = 0; k <= 1.0001; k += .05) {
+    const m = c.map((v, i) => v + (t[i] - v) * k);
+    if (contrast(m, b) >= 4.6) return rgb2hex(m);
+  }
+  return lighten ? '#FFFFFF' : '#000000';
+}
+function applyTheme() {
+  const c = theme.colors, root = document.documentElement, st = root.style;
+  st.setProperty('--brand', c.primary); st.setProperty('--brand-ink', ink(c.primary));
+  st.setProperty('--brand-text-l', readable(c.primary, '#FFFFFF', false));
+  st.setProperty('--brand-text-d', readable(c.primary, '#141B1F', true));
+  st.setProperty('--band', c.banner); st.setProperty('--band-ink', ink(c.banner));
+  ['w1', 'w2', 'w3', 'w4', 'notice', 'absent'].forEach(k => { st.setProperty('--' + k, c[k]); st.setProperty('--' + k + '-ink', ink(c[k])); });
+  if (theme.mode === 'auto') root.removeAttribute('data-mode'); else root.setAttribute('data-mode', theme.mode);
+}
+function renderThemePanel() {
+  const panel = $('#themePanel');
+  panel.innerHTML = `
+    <div class="dh"><h2>Colours</h2><button type="button" class="iconbtn" data-close aria-label="Close colours">${ICON.close}</button></div>
+    <section class="ds"><h3>Theme</h3><div class="presets">${Object.entries(PRESETS).map(([k, p]) => `
+      <button type="button" class="preset" data-preset="${k}" aria-pressed="${!theme.custom && theme.base === k}">
+        <span class="sw">${['primary', 'banner', 'w1', 'w2', 'w3', 'w4'].map(c => `<i style="background:${p[c]}"></i>`).join('')}</span>
+        <span><span class="pn">${p.name}</span><small>${theme.custom && theme.base === k ? 'Your adjusted version of this theme' : p.note}</small></span>
+      </button>`).join('')}</div></section>
+    <section class="ds"><h3>Mode</h3><div class="seg full" role="group" aria-label="Light or dark">${[['auto','Auto'],['light','Light'],['dark','Dark']].map(([m, l]) => `<button type="button" data-mode-set="${m}" aria-pressed="${theme.mode === m}">${l}</button>`).join('')}</div></section>
+    <section class="ds"><h3>Adjust colours</h3><div class="colors">${COLOR_KEYS.map(([k, l]) => `
+      <label class="colorfield" for="c-${k}"><input type="color" id="c-${k}" data-color="${k}" value="${theme.colors[k].toLowerCase()}"><span>${l}<code id="code-${k}">${theme.colors[k].toUpperCase()}</code></span></label>`).join('')}</div>
+      <button type="button" class="btn ghost" data-reset ${theme.custom ? '' : 'disabled'}>Reset to ${PRESETS[theme.base].name}</button></section>
+    <p class="dnote">In the Oracle app each theme is a row in <code>SVC_THEMES</code>, and each person’s choice is kept in <code>SVC_USER_PREFS</code>, so it follows them to any device.</p>`;
+}
+function openTheme() { if (!$('#chatPanel').hidden) closeChat(); renderThemePanel(); $('#themePanel').hidden = false; $('#themeBtn').setAttribute('aria-expanded', 'true'); syncScrim(); $('#themePanel [aria-pressed="true"]')?.focus(); }
+function closeTheme() { $('#themePanel').hidden = true; $('#themeBtn').setAttribute('aria-expanded', 'false'); syncScrim(); }
+$('#themeBtn').addEventListener('click', () => $('#themePanel').hidden ? openTheme() : closeTheme());
+const panel = $('#themePanel');
+panel.addEventListener('click', e => {
+  if (e.target.closest('[data-close]')) { closeTheme(); $('#themeBtn').focus(); return; }
+  const p = e.target.closest('[data-preset]');
+  if (p) { theme.base = p.dataset.preset; theme.custom = false; theme.colors = pick(PRESETS[theme.base]); applyTheme(); save(); renderThemePanel(); $(`[data-preset="${theme.base}"]`, panel)?.focus(); toast(`${PRESETS[theme.base].name} applied`); return; }
+  const m = e.target.closest('[data-mode-set]');
+  if (m) { theme.mode = m.dataset.modeSet; applyTheme(); save(); renderThemePanel(); $(`[data-mode-set="${theme.mode}"]`, panel)?.focus(); return; }
+  if (e.target.closest('[data-reset]')) { theme.custom = false; theme.colors = pick(PRESETS[theme.base]); applyTheme(); save(); renderThemePanel(); toast(`${PRESETS[theme.base].name} restored`); }
+});
+panel.addEventListener('input', e => {
+  const k = e.target.dataset.color; if (!k) return;
+  theme.colors[k] = e.target.value.toUpperCase(); theme.custom = true;
+  applyTheme(); save();
+  const code = $('#code-' + k, panel); if (code) code.textContent = theme.colors[k];
+  panel.querySelectorAll('[data-preset]').forEach(b => b.setAttribute('aria-pressed', 'false'));
+  const rb = $('[data-reset]', panel); if (rb) rb.disabled = false;
+});
+
+/* ---------- signed-in identity and staff chat ---------- */
+const hasClaude = !!(window.claude && typeof window.claude.use === 'function');
+const chat = { db: null, user: null, room: null, myId: null, owner: false, canWrite: null, readOnly: false,
+  docs: new Map(), mine: [], loaded: false, lastAt: 0, firstSnap: true, peers: [], timer: null, queue: Promise.resolve(), confirmClear: false };
+const CHAT_KEEP = 100;
+let chatSeen = 0;
+try { chatSeen = +localStorage.getItem('svc-chat-seen') || 0; } catch (e) { /* storage unavailable */ }
+const useCap = name => hasClaude ? Promise.resolve(window.claude.use(name)).catch(() => null) : Promise.resolve(null);
+
+function setIdentity(mode, name) {
+  ui.identity = mode;
+  const sel = $('#roleSelect'), lbl = $('#roleLabel'), hint = $('#roleHint'), who = $('#whoLine');
+  if (mode === 'staff') {
+    ui.role = 'INVIG';
+    sel.hidden = true; lbl.textContent = 'Signed in';
+    who.hidden = false; who.textContent = (name || 'Staff member') + ' · Staff';
+    hint.textContent = 'The Day report is for the portal owner only.';
+    if (ui.view === 'report') { ui.view = 'dashboard'; try { location.hash = 'dashboard'; } catch (e) { /* ignore */ } }
+  } else {
+    sel.hidden = false; lbl.textContent = 'Viewing as'; who.hidden = !name;
+    if (name) who.textContent = name + ' · Owner';
+    hint.textContent = mode === 'owner' ? 'You own this portal. Switch to see what staff see; they don’t see this switch.' : 'Preview switch. In the Oracle app the role comes from each person’s login.';
+    ui.role = sel.value;
+  }
+  render();
+  if (mode !== 'staff' && ui.pendingRoute) { const r = ui.pendingRoute; ui.pendingRoute = null; go(r); }
+  ui.pendingRoute = null;
+}
+
+async function initIdentity() {
+  if (!hasClaude) { setIdentity('preview'); return; }
+  const user = await useCap('user');
+  chat.user = user;
+  if (!user) { setIdentity('preview'); return; }
+  const me = await user.me();
+  chat.myId = me.id; chat.owner = me.isOwner;
+  setIdentity(me.isOwner ? 'owner' : 'staff', me.name);
+  chat.canWrite = await user.can('data.write');
+  renderComposer();
+}
+async function initChat() {
+  const db = await useCap('db');
+  if (!db) return;
+  chat.db = db;
+  $('#chatBtn').hidden = false;
+  chat.timer = setTimeout(() => { if (!chat.loaded) setChatNote('The chat can’t be reached yet. Messages appear as soon as the connection returns.'); }, 10000);
+  db.collection('chat').onSnapshot(snap => {
+    chat.docs = new Map(snap.docs.filter(d => d.exists).map(d => [d.id, d.data() || {}]));
+    if (chat.myId && !snap.metadata.hasPendingWrites) {
+      const mine = chat.docs.get(chat.myId);
+      chat.mine = Array.isArray(mine && mine.msgs) ? mine.msgs.slice() : [];
+    }
+    if (!snap.metadata.fromCache && !chat.loaded) { chat.loaded = true; clearTimeout(chat.timer); setChatNote(''); }
+    renderChat(true);
+  }, () => { chat.loaded = true; clearTimeout(chat.timer); setChatNote('The chat isn’t available right now.'); });
+}
+async function initPresence() {
+  const room = await useCap('room');
+  if (!room) return;
+  chat.room = room;
+  room.onPeers(ch => { chat.peers = ch.peers; renderOnline(); }, () => { chat.peers = []; renderOnline(); });
+  pushPresence();
+}
+let lastWhere = '';
+function whereLabel() {
+  if (ui.view === 'report') return 'Day report';
+  if (ui.view === 'dashboard') return 'Overview';
+  const r = ROOMS.find(x => x.id === ui.room);
+  return `${r.name} · ${PERIODS.find(p => p[0] === ui.period)[1]}`;
+}
+function pushPresence() {
+  if (chat.api) { chat.api.setWhere(whereLabel()); return; }
+  if (!chat.room) return;
+  const w = whereLabel();
+  if (w === lastWhere) return;
+  lastWhere = w;
+  chat.room.presence({ where: w }).catch(() => {});
+}
+
+function allMessages() {
+  if (chat.api) return chat.api.messages();
+  const out = [];
+  chat.docs.forEach((d, uid) => (Array.isArray(d.msgs) ? d.msgs : []).forEach(m => {
+    if (m && typeof m.t === 'string' && typeof m.at === 'number') out.push({ uid, id: String(m.id || ''), t: m.t.slice(0, 1000), at: m.at });
+  }));
+  return out.sort((a, b) => a.at - b.at).slice(-300);
+}
+async function profilesFor(ids) {
+  if (chat.api) return chat.api.profiles([...new Set(ids)]);
+  if (!chat.user || !ids.length) return {};
+  try { return await chat.user.profiles([...new Set(ids)]); } catch (e) { return {}; }
+}
+const nameOf = (ps, id) => (ps[id] && ps[id].name) || 'Someone';
+function chatOpen() { return !$('#chatPanel').hidden; }
+function dayLabel(ms) {
+  const d = new Date(ms), t = new Date(), y = new Date(); y.setDate(t.getDate() - 1);
+  const same = (a, b) => a.toDateString() === b.toDateString();
+  return same(d, t) ? 'Today' : same(d, y) ? 'Yesterday' : d.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' });
+}
+const timeLabel = ms => new Date(ms).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+
+async function renderChat(fromSnapshot) {
+  const msgs = allMessages();
+  const others = msgs.filter(m => m.uid !== chat.myId);
+  const newest = msgs.length ? msgs[msgs.length - 1].at : 0;
+  if (fromSnapshot === true) {
+    const fresh = chat.firstSnap ? [] : others.filter(m => m.at > chat.lastAt);
+    chat.firstSnap = false;
+    chat.lastAt = Math.max(chat.lastAt, newest);
+    if (fresh.length && !chatOpen()) {
+      const last = fresh[fresh.length - 1];
+      const ps = await profilesFor([last.uid]);
+      toast(`${nameOf(ps, last.uid)}: ${last.t.length > 70 ? last.t.slice(0, 70) + '…' : last.t}`);
+    }
+  }
+  if (chatOpen()) markSeen(newest);
+  const unread = others.filter(m => m.at > chatSeen).length;
+  const badge = $('#chatBadge');
+  badge.hidden = !unread; badge.textContent = unread > 9 ? '9+' : String(unread);
+  $('#chatBtn').setAttribute('aria-label', unread ? `Staff chat, ${unread} unread` : 'Staff chat');
+  if (!chatOpen()) return;
+
+  const box = $('#chatMsgs');
+  if (chat.api && chat.api.gate()) { box.replaceChildren(); return; }
+  const nearBottom = box.scrollHeight - box.scrollTop - box.clientHeight < 80;
+  const ps = await profilesFor(msgs.map(m => m.uid));
+  const frag = document.createDocumentFragment();
+  if (!msgs.length) {
+    const p = document.createElement('p'); p.className = 'empty';
+    p.textContent = chat.loaded ? 'No messages yet. Say hello to the exam team.' : 'Loading messages…';
+    frag.append(p);
+  }
+  let lastDay = '';
+  msgs.forEach(m => {
+    const day = dayLabel(m.at);
+    if (day !== lastDay) { const sep = document.createElement('div'); sep.className = 'daysep'; sep.textContent = day; frag.append(sep); lastDay = day; }
+    const mine = m.uid === chat.myId;
+    const row = document.createElement('div'); row.className = 'msg' + (mine ? ' me' : '');
+    if (!mine) { const img = document.createElement('img'); img.alt = ''; img.src = ps[m.uid] ? ps[m.uid].avatarUrl : ''; row.append(img); }
+    const b = document.createElement('div'); b.className = 'bubble';
+    const who = document.createElement('div'); who.className = 'who';
+    const nm = document.createElement('span'); nm.textContent = mine ? 'You' : nameOf(ps, m.uid);
+    const tm = document.createElement('time'); tm.dateTime = new Date(m.at).toISOString(); tm.textContent = timeLabel(m.at);
+    who.append(nm, tm);
+    const txt = document.createElement('p'); txt.className = 'txt'; txt.dir = 'auto'; txt.textContent = m.t;
+    b.append(who, txt);
+    if (mine || chat.owner) {
+      const del = document.createElement('button'); del.type = 'button'; del.className = 'msgdel';
+      del.textContent = 'Delete'; del.dataset.del = m.id; del.dataset.uid = m.uid;
+      del.setAttribute('aria-label', 'Delete this message');
+      b.append(del);
+    }
+    row.append(b); frag.append(row);
+  });
+  box.replaceChildren(frag);
+  if (nearBottom || fromSnapshot === 'open') box.scrollTop = box.scrollHeight;
+}
+function markSeen(at) {
+  if (at <= chatSeen) return;
+  chatSeen = at;
+  try { localStorage.setItem('svc-chat-seen', String(at)); } catch (e) { /* storage unavailable */ }
+}
+async function renderOnline() {
+  const list = $('#onlineList');
+  let rows;
+  if (chat.api) rows = chat.api.gate() ? [] : await chat.api.online();
+  else {
+    const byKey = new Map();
+    chat.peers.filter(p => p.kind === 'viewer').forEach(p => { const k = p.by || p.peer; if (!byKey.has(k) || p.sameTab) byKey.set(k, p); });
+    const people = [...byKey.values()].sort((a, b) => (b.isMe - a.isMe));
+    const ps = await profilesFor(people.map(p => p.by).filter(Boolean));
+    rows = people.map(p => ({ isMe: p.isMe, name: p.by ? nameOf(ps, p.by) : 'Someone', avatar: p.by && ps[p.by] ? ps[p.by].avatarUrl : '',
+      where: p.presence && typeof p.presence.where === 'string' ? p.presence.where : '' }));
+  }
+  $('#onlineHead').textContent = `${chat.api ? chat.api.onlineTitle : 'Online now'} · ${rows.length}`;
+  list.replaceChildren(...rows.map(p => {
+    const li = document.createElement('li');
+    const img = document.createElement('img'); img.alt = ''; img.src = p.avatar || '';
+    if (!p.avatar) img.hidden = true;
+    const nm = document.createElement('span'); nm.className = 'nm';
+    nm.textContent = p.isMe ? 'You' : (p.name || 'Someone');
+    const where = document.createElement('span'); where.className = 'where';
+    where.textContent = String(p.where || '').slice(0, 40);
+    li.append(img, nm, where);
+    return li;
+  }));
+  $('#onlineSec').hidden = !rows.length;
+}
+function setChatNote(text) { const n = $('#chatNote'); n.textContent = text; n.hidden = !text; }
+function footButton(label, key, val, ghost) {
+  const b = document.createElement('button'); b.type = 'button'; b.className = 'btn sm' + (ghost ? ' ghost' : '');
+  b.dataset[key] = val; b.textContent = label; return b;
+}
+function renderComposer() {
+  const foot = $('#chatFoot');
+  foot.replaceChildren();
+  if (chat.api) {
+    const gate = chat.api.gate();
+    $('#chatForm').hidden = !!gate;
+    setChatNote(chat.api.note());
+    if (gate === 'signin') { foot.append(footButton('Sign in with Google', 'fbsignin', '1', false)); return; }
+    if (gate === 'denied') { foot.append(footButton('Use another account', 'fbsignout', '1', true)); return; }
+    if (gate) return;
+    const info = document.createElement('span'); info.textContent = 'Signed in as ' + chat.api.who();
+    foot.append(info, footButton('Sign out', 'fbsignout', '1', true));
+  } else {
+    const blocked = chat.readOnly || chat.canWrite === false || (chat.user && !chat.myId);
+    $('#chatForm').hidden = !!blocked;
+    if (blocked) setChatNote(chat.user && !chat.myId ? 'Sign in to claude.ai to post in the chat.' : 'You can read the chat. To post, ask the portal owner to give you Contributor access.');
+    const info = document.createElement('span');
+    info.textContent = 'Everyone with access to the portal can read the chat.';
+    foot.append(info);
+  }
+  if (chat.owner) {
+    if (chat.confirmClear) {
+      const wrap = document.createElement('span'); wrap.style.display = 'inline-flex'; wrap.style.gap = '6px';
+      const yes = document.createElement('button'); yes.type = 'button'; yes.className = 'btn sm'; yes.dataset.clear = 'yes'; yes.textContent = 'Delete all messages';
+      const no = document.createElement('button'); no.type = 'button'; no.className = 'btn sm ghost'; no.dataset.clear = 'no'; no.textContent = 'Cancel';
+      wrap.append(yes, no); foot.append(wrap);
+    } else {
+      const clr = document.createElement('button'); clr.type = 'button'; clr.className = 'btn sm ghost'; clr.dataset.clear = 'ask'; clr.textContent = 'Clear chat';
+      foot.append(clr);
+    }
+  }
+}
+function writeMine(fn) {
+  const p = chat.queue.then(async () => {
+    const next = fn(chat.mine);
+    await chat.db.doc('chat/' + chat.myId).set({ msgs: next });
+    chat.mine = next;
+  });
+  chat.queue = p.catch(() => {});
+  return p;
+}
+function chatWriteFailed(err) {
+  const c = err && err.code;
+  if (c === 'invalid_argument') { chat.readOnly = true; renderComposer(); }
+  else if (c === 'quota_exceeded') toast('The chat is full. The portal owner can clear old messages.');
+  else if (c === 'revoked') { chat.readOnly = true; renderComposer(); }
+  else toast('Message not sent. Check the connection and try again.');
+}
+function sendChat() {
+  const el = $('#chatInput');
+  const text = el.value.trim();
+  if (text && chat.api) {
+    if (chat.api.gate()) return;
+    el.value = '';
+    chat.api.send(text.slice(0, 1000)).catch(() => { if (!el.value) el.value = text; toast('Message not sent. Check the connection and try again.'); });
+    return;
+  }
+  if (!text || !chat.db) return;
+  if (!chat.myId) { toast('Sign in to claude.ai to post in the chat.'); return; }
+  el.value = '';
+  const msg = { id: Date.now().toString(36) + Math.random().toString(36).slice(2, 8), t: text.slice(0, 1000), at: Date.now() };
+  writeMine(list => list.concat(msg).slice(-CHAT_KEEP)).catch(err => { if (!el.value) el.value = text; chatWriteFailed(err); });
+}
+async function deleteMessage(uid, id) {
+  if (chat.api) {
+    try { await chat.api.remove(uid, id); toast('Message deleted'); } catch (err) { toast('The message couldn’t be deleted.'); }
+    return;
+  }
+  try {
+    if (uid === chat.myId) await writeMine(list => list.filter(m => m.id !== id));
+    else if (chat.owner) {
+      const d = chat.docs.get(uid);
+      const next = (Array.isArray(d && d.msgs) ? d.msgs : []).filter(m => m.id !== id);
+      await chat.db.doc('chat/' + uid).set({ msgs: next });
+    }
+    toast('Message deleted');
+  } catch (err) { toast('The message couldn’t be deleted.'); }
+}
+async function clearChat() {
+  chat.confirmClear = false; renderComposer();
+  if (chat.api) {
+    try { await chat.api.clear(); toast('Chat cleared'); } catch (err) { toast('Some messages couldn’t be deleted. Try again.'); }
+    return;
+  }
+  try {
+    for (const uid of [...chat.docs.keys()]) await chat.db.doc('chat/' + uid).delete();
+    chat.mine = [];
+    toast('Chat cleared');
+  } catch (err) { toast('Some messages couldn’t be deleted. Try again.'); }
+}
+function openChat() {
+  if (!$('#themePanel').hidden) closeTheme();
+  closeNav();
+  $('#chatPanel').hidden = false; $('#chatBtn').setAttribute('aria-expanded', 'true'); syncScrim();
+  renderComposer(); renderOnline(); renderChat('open');
+  const inp = $('#chatInput'); if (inp && !$('#chatForm').hidden) inp.focus();
+}
+function closeChat() { $('#chatPanel').hidden = true; $('#chatBtn').setAttribute('aria-expanded', 'false'); syncScrim(); }
+$('#chatBtn').addEventListener('click', () => chatOpen() ? closeChat() : openChat());
+$('#chatForm').addEventListener('submit', e => { e.preventDefault(); sendChat(); });
+$('#chatInput').addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftKey && !e.isComposing) { e.preventDefault(); sendChat(); } });
+$('#chatPanel').addEventListener('click', e => {
+  if (e.target.closest('[data-chat-close]')) { closeChat(); $('#chatBtn').focus(); return; }
+  const d = e.target.closest('[data-del]'); if (d) { deleteMessage(d.dataset.uid, d.dataset.del); return; }
+  if (chat.api && e.target.closest('[data-fbsignin]')) { chat.api.signIn(); return; }
+  if (chat.api && e.target.closest('[data-fbsignout]')) { chat.api.signOut(); return; }
+  const c = e.target.closest('[data-clear]');
+  if (c) { if (c.dataset.clear === 'ask') { chat.confirmClear = true; renderComposer(); } else if (c.dataset.clear === 'yes') clearChat(); else { chat.confirmClear = false; renderComposer(); } }
+});
+
+/* ---------- chat outside claude.ai (GitHub Pages): Firebase ----------
+   Used only when the page runs on its own. Staff sign in with Google; who may
+   read and post is decided by the config/access document and the Firestore
+   rules (see firestore.rules and the README). */
+const FIREBASE_SDK = 'https://www.gstatic.com/firebasejs/10.12.2/firebase-';
+function loadScript(src) {
+  return new Promise((resolve, reject) => {
+    const el = document.createElement('script');
+    el.src = src; el.onload = resolve; el.onerror = () => reject(new Error('load'));
+    document.head.appendChild(el);
+  });
+}
+function initialsAvatar(name) {
+  const parts = String(name || '?').trim().split(/\s+/);
+  const ini = ((parts[0] || '?')[0] + (parts.length > 1 ? parts[parts.length - 1][0] : '')).toUpperCase();
+  let h = 0; for (const ch of String(name || '')) h = (h * 31 + ch.charCodeAt(0)) % 360;
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64"><rect width="64" height="64" rx="32" fill="hsl(${h},45%,42%)"/><text x="32" y="41" font-family="Arial,sans-serif" font-size="26" font-weight="700" fill="#fff" text-anchor="middle">${ini.replace(/[<&>"']/g, '')}</text></svg>`;
+  return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
+}
+async function initFirebaseChat() {
+  if (hasClaude) return;
+  $('#chatBtn').hidden = false;
+  const cfg = window.SVC_CHAT_CONFIG;
+  let auth = null, fdb = null, gate = 'setup';
+  // Kept light for the free plan: presence is written when someone signs in and
+  // when they settle on a room for a minute, never on a timer.
+  const ACTIVE_MS = 12 * 60 * 60 * 1000, HISTORY_MS = 3 * 24 * 60 * 60 * 1000;
+  const st = { msgs: [], presence: [], online: [], me: null, admins: [], where: '', written: null, unsub: [], whereTimer: null, denied: '' };
+  const stop = () => { st.unsub.forEach(u => { try { u(); } catch (e) { /* ignore */ } }); st.unsub = []; clearTimeout(st.whereTimer); st.written = null; };
+  const refreshOnline = () => {
+    const now = Date.now();
+    st.online = st.presence.filter(p => now - p.lastSeen < ACTIVE_MS)
+      .sort((a, b) => (st.me && b.uid === st.me.uid) - (st.me && a.uid === st.me.uid));
+    renderOnline();
+  };
+  const writePresence = () => {
+    if (!st.me || gate || st.where === st.written) return;
+    st.written = st.where;
+    fdb.collection('presence').doc(st.me.uid).set({
+      name: (st.me.displayName || st.me.email || '').slice(0, 150), photo: (st.me.photoURL || '').slice(0, 500),
+      where: st.where.slice(0, 40), lastSeen: firebase.firestore.FieldValue.serverTimestamp()
+    }).catch(() => { st.written = null; });
+  };
+  chat.api = {
+    gate: () => gate,
+    onlineTitle: 'Active today',
+    note() {
+      return gate === 'setup' ? 'The chat isn’t connected yet. The portal owner can connect it by following “Set up the chat” in the README.'
+        : gate === 'loading' ? 'Connecting to the chat…'
+        : gate === 'signin' ? 'Sign in with your Google account to read and post messages.'
+        : gate === 'denied' ? `${st.denied || 'This account'} isn’t on the chat list. Ask the portal owner to add this email, or sign in with another account.`
+        : gate === 'error' ? 'The chat isn’t available right now. Check the connection and reload the page.' : '';
+    },
+    who: () => st.me ? (st.me.displayName || st.me.email || '') : '',
+    messages: () => st.msgs,
+    async profiles(ids) {
+      const src = new Map();
+      st.presence.forEach(p => src.set(p.uid, p));
+      st.msgs.forEach(m => src.set(m.uid, { name: m.name, photo: m.photo }));
+      const out = {};
+      ids.forEach(id => { const p = src.get(id) || {}; out[id] = { name: p.name || '', avatarUrl: p.photo || initialsAvatar(p.name) }; });
+      return out;
+    },
+    async online() {
+      return st.online.map(p => ({ isMe: !!st.me && p.uid === st.me.uid, name: p.name, avatar: p.photo || initialsAvatar(p.name), where: p.where }));
+    },
+    send: text => fdb.collection('messages').add({
+      uid: st.me.uid, name: (st.me.displayName || st.me.email || '').slice(0, 150), photo: (st.me.photoURL || '').slice(0, 500),
+      text, at: firebase.firestore.FieldValue.serverTimestamp()
+    }),
+    remove: (uid, id) => fdb.collection('messages').doc(id).delete(),
+    async clear() {
+      const snap = await fdb.collection('messages').get();
+      for (const d of snap.docs) await d.ref.delete();
+    },
+    setWhere(w) { st.where = w; clearTimeout(st.whereTimer); st.whereTimer = setTimeout(writePresence, 60 * 1000); },
+    signIn() {
+      auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()).catch(err => {
+        if (err && err.code === 'auth/unauthorized-domain') toast('This website isn’t on the chat’s list of allowed domains yet. See “Set up the chat” in the README.');
+        else if (!(err && /popup-closed|cancelled-popup/.test(err.code || ''))) toast('Sign-in didn’t finish. Try again.');
+      });
+    },
+    async signOut() {
+      if (st.me && !gate) await fdb.collection('presence').doc(st.me.uid).delete().catch(() => {});
+      stop(); auth.signOut();
+    }
+  };
+  if (!cfg || !cfg.firebase || !cfg.firebase.apiKey) { renderComposer(); return; }
+  gate = 'loading'; renderComposer();
+  try {
+    if (!window.firebase) for (const part of ['app', 'auth', 'firestore']) await loadScript(`${FIREBASE_SDK}${part}-compat.js`);
+    firebase.initializeApp(cfg.firebase);
+    auth = firebase.auth(); fdb = firebase.firestore();
+  } catch (e) { gate = 'error'; renderComposer(); return; }
+  auth.onAuthStateChanged(async user => {
+    stop();
+    st.me = user; st.msgs = []; st.presence = []; st.online = [];
+    chat.myId = user ? user.uid : null; chat.owner = false; chat.loaded = false; chat.firstSnap = true;
+    if (!user) { gate = 'signin'; renderComposer(); renderChat(); renderOnline(); return; }
+    gate = 'loading'; renderComposer();
+    try {
+      const acc = await fdb.doc('config/access').get();
+      st.admins = (acc.get('admins') || []).map(e => String(e).toLowerCase());
+    } catch (e) {
+      st.denied = user.email || ''; gate = 'denied'; renderComposer(); renderChat(); renderOnline(); return;
+    }
+    chat.owner = st.admins.includes(String(user.email || '').toLowerCase());
+    gate = '';
+    const since = ms => firebase.firestore.Timestamp.fromMillis(Date.now() - ms);
+    st.unsub.push(fdb.collection('messages').where('at', '>=', since(HISTORY_MS)).orderBy('at', 'desc').limit(100).onSnapshot(snap => {
+      st.msgs = snap.docs.map(d => {
+        const at = d.get('at', { serverTimestamps: 'estimate' });
+        return { uid: String(d.get('uid') || ''), id: d.id, t: String(d.get('text') || '').slice(0, 1000),
+          at: at && at.toMillis ? at.toMillis() : Date.now(), name: String(d.get('name') || ''), photo: String(d.get('photo') || '') };
+      }).reverse();
+      chat.loaded = true;
+      renderChat(true);
+    }, () => { gate = 'error'; renderComposer(); }));
+    st.unsub.push(fdb.collection('presence').where('lastSeen', '>', since(ACTIVE_MS)).onSnapshot(snap => {
+      st.presence = snap.docs.map(d => {
+        const t = d.get('lastSeen', { serverTimestamps: 'estimate' });
+        return { uid: d.id, name: String(d.get('name') || ''), photo: String(d.get('photo') || ''), where: String(d.get('where') || ''), lastSeen: t && t.toMillis ? t.toMillis() : 0 };
+      });
+      refreshOnline();
+    }, () => {}));
+    st.where = whereLabel(); writePresence();
+    renderComposer(); renderOnline(); renderChat();
+  });
+  window.addEventListener('pagehide', () => { if (st.me && !gate) fdb.collection('presence').doc(st.me.uid).delete().catch(() => {}); });
+}
+
+/* ---------- start ---------- */
+syncExam();
+applyTheme();
+if (hasClaude) { $('#roleSelect').hidden = true; $('#roleLabel').textContent = 'Signed in'; $('#roleHint').textContent = 'Checking your access…'; }
+setTimeout(getDownloads, 0);
+applyRoute(decodeURIComponent((location.hash || '').slice(1)) || 'room-13');
+initIdentity();
+initChat();
+initPresence();
+initFirebaseChat();
+})();
+</script>
+</body>
+</html>
